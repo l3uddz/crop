@@ -4,7 +4,8 @@ import (
 	"time"
 )
 
-func Get(key string) bool {
+func Get(key string) (bool, time.Time) {
+	var expires time.Time
 	changes := false
 	exists := false
 
@@ -24,6 +25,7 @@ func Get(key string) bool {
 		} else {
 			// the item has not expired
 			exists = true
+			expires = expiry
 		}
 	}
 
@@ -35,5 +37,5 @@ func Get(key string) bool {
 		}
 	}
 
-	return exists
+	return exists, expires
 }

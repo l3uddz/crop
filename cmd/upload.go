@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/uploader"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/yale8848/gorpool"
 )
@@ -27,7 +29,6 @@ var uploadCmd = &cobra.Command{
 			}
 
 			log := log.WithField("uploader", uploaderName)
-			log.Info("Uploader commencing...")
 
 			// create uploader
 			upload, err := uploader.New(config.Config, &uploaderConfig, uploaderName)
@@ -40,7 +41,31 @@ var uploadCmd = &cobra.Command{
 			if upload.ServiceAccountCount > 0 {
 				upload.Log.WithField("found_files", upload.ServiceAccountCount).
 					Info("Loaded service accounts")
+			} else {
+				// no service accounts were loaded
+				// check to see if any of the copy or move remote(s) are banned
+				banned, expiry := upload.RemotesBanned(upload.Config.Remotes.Copy)
+				if banned && !expiry.IsZero() {
+					// one of the copy remotes is banned, abort
+					upload.Log.WithFields(logrus.Fields{
+						"expires_time": expiry,
+						"expires_in":   humanize.Time(expiry),
+					}).Warn("Cannot proceed with upload as a copy remote is banned")
+					continue
+				}
+
+				banned, expiry = upload.RemotesBanned([]string{upload.Config.Remotes.Move})
+				if banned && !expiry.IsZero() {
+					// the move remote is banned, abort
+					upload.Log.WithFields(logrus.Fields{
+						"expires_time": expiry,
+						"expires_in":   humanize.Time(expiry),
+					}).Warn("Cannot proceed with upload as the move remote is banned")
+					continue
+				}
 			}
+
+			log.Info("Uploader commencing...")
 
 			// refresh details about files to upload
 			if err := upload.RefreshLocalFiles(); err != nil {

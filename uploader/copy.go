@@ -5,6 +5,7 @@ import (
 	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/pathutils"
 	"github.com/l3uddz/crop/rclone"
+	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -58,14 +59,20 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 				break
 			}
 
-			// are we using service accounts?
-			if u.ServiceAccountCount == 0 {
-				return fmt.Errorf("copy failed with exit code: %v", exitCode)
-			}
-
 			// is this an exit code we can retry?
 			switch exitCode {
 			case rclone.EXIT_FATAL_ERROR:
+				// are we using service accounts?
+				if u.ServiceAccountCount == 0 {
+					// we are not using service accounts, so mark this remote as banned
+					if err := cache.Set(stringutils.FromLeftUntil(remotePath, ":"),
+						time.Now().UTC().Add(25*time.Hour)); err != nil {
+						rLog.WithError(err).Errorf("Failed banning remote")
+					}
+
+					return fmt.Errorf("copy failed with exit code: %v", exitCode)
+				}
+
 				// ban this service account
 				if err := cache.Set(serviceAccount.RealPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
 					rLog.WithError(err).Error("Failed banning service account, cannot try again...")
