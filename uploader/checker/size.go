@@ -33,3 +33,20 @@ func (_ Size) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathu
 
 	return false, nil
 }
+
+func (_ Size) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
+	var params []string
+
+	// add filters
+	for _, include := range cfg.Include {
+		params = append(params,
+			"--include", include)
+	}
+
+	for _, exclude := range cfg.Exclude {
+		params = append(params,
+			"--exclude", exclude)
+	}
+
+	return params
+}

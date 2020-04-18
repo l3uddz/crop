@@ -14,11 +14,16 @@ type UploaderHidden struct {
 	Cleanup bool
 }
 
+type UploaderRemotesMoveServerSide struct {
+	From string
+	To   string
+}
+
 type UploaderRemotes struct {
 	Clean          []string
 	Copy           []string
 	Move           string
-	MoveServerSide []map[string]string `mapstructure:"move_server_side"`
+	MoveServerSide []UploaderRemotesMoveServerSide `mapstructure:"move_server_side"`
 	Dedupe         []string
 }
 

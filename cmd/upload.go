@@ -75,6 +75,8 @@ func init() {
 }
 
 func performUpload(u *uploader.Uploader) error {
+	u.Log.Info("Running...")
+
 	/* Cleans */
 	if u.Config.Hidden.Enabled {
 		gp := gorpool.NewPool(config.Config.Core.Workers, 0).
@@ -87,16 +89,30 @@ func performUpload(u *uploader.Uploader) error {
 		}
 	}
 
+	/* Generate Additional Rclone Params */
+	additionalRcloneParams := u.CheckRcloneParams()
+
 	/* Copies */
 	if len(u.Config.Remotes.Copy) > 0 {
-		if err := u.Copy(); err != nil {
-			return errors.WithMessage(err, "failed performing copies")
+		if err := u.Copy(additionalRcloneParams); err != nil {
+			return errors.WithMessage(err, "failed performing all copies")
 		}
 	}
 
 	/* Move */
+	if len(u.Config.Remotes.Move) > 0 {
+		if err := u.Move(false, additionalRcloneParams); err != nil {
+			return errors.WithMessage(err, "failed performing move")
+		}
+	}
 
 	/* Move Server Side */
+	if len(u.Config.Remotes.MoveServerSide) > 0 {
+		if err := u.Move(true, nil); err != nil {
+			return errors.WithMessage(err, "failed performing server-side moves")
+		}
+	}
 
+	u.Log.Info("Finished!")
 	return nil
 }

@@ -10,45 +10,91 @@ import (
 
 /* Public */
 
-func Move(u *config.UploaderConfig, localPath string, remotePath string, serviceAccountFile *pathutils.Path) (bool, int, error) {
+func Move(u *config.UploaderConfig, from string, to string, serviceAccountFile *pathutils.Path, serverSide bool,
+	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action":      CMD_MOVE,
-		"local_path":  localPath,
-		"remote_path": remotePath,
+		"action": CMD_MOVE,
+		"from":   from,
+		"to":     to,
 	})
 	result := false
 
 	// generate required rclone parameters
 	params := []string{
 		CMD_MOVE,
-		localPath,
-		remotePath,
+		from,
+		to,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating baseParams to %q: %q -> %q",
-			CMD_MOVE, localPath, remotePath)
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q -> %q",
+			CMD_MOVE, from, to)
 	} else {
 		params = append(params, baseParams...)
 	}
 
-	if additionalParams, err := getAdditionalParams(CMD_MOVE, u.RcloneParams.Move); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating additionalParams to %q: %q -> %q",
-			CMD_MOVE, localPath, remotePath)
+	extraParams := u.RcloneParams.Move
+	if serverSide {
+		// this is a server side move, so add any additional configured params
+		extraParams = append(extraParams, u.RcloneParams.MoveServerSide...)
+		// add server side parameter
+		extraParams = append(extraParams, "--drive-server-side-across-configs")
+	} else if additionalRcloneParams != nil {
+		// add additional params from parameters
+		extraParams = append(extraParams, additionalRcloneParams...)
+	}
+
+	if additionalParams, err := getAdditionalParams(CMD_MOVE, extraParams); err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",
+			CMD_MOVE, from, to)
 	} else {
 		params = append(params, additionalParams...)
 	}
 
-	if serviceAccountFile != nil {
-		params = append(params, getServiceAccountParams(serviceAccountFile)...)
+	if serviceAccountFile != nil && !serverSide {
+		// service account file provided but this is a server side move, so ignore it
+		saParams := getServiceAccountParams(serviceAccountFile)
+		params = append(params, saParams...)
 	}
 
-	rLog.Tracef("Generated params: %v", params)
+	rLog.Debugf("Generated params: %v", params)
 
-	// remove file
-	rcloneCmd := cmd.NewCmd(cfg.Rclone.Path, params...)
+	// setup cmd
+	cmdOptions := cmd.Options{
+		Buffered:  false,
+		Streaming: true,
+	}
+	rcloneCmd := cmd.NewCmdOptions(cmdOptions, cfg.Rclone.Path, params...)
+
+	// live stream logs
+	doneChan := make(chan struct{})
+	go func() {
+		defer close(doneChan)
+
+		for rcloneCmd.Stdout != nil || rcloneCmd.Stderr != nil {
+			select {
+			case line, open := <-rcloneCmd.Stdout:
+				if !open {
+					rcloneCmd.Stdout = nil
+					continue
+				}
+				log.Info(line)
+			case line, open := <-rcloneCmd.Stderr:
+				if !open {
+					rcloneCmd.Stderr = nil
+					continue
+				}
+				log.Info(line)
+			}
+		}
+	}()
+
+	// run command
+	rLog.Debug("Starting...")
+
 	status := <-rcloneCmd.Start()
+	<-doneChan
 
 	// check status
 	switch status.Exit {

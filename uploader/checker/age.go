@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/pathutils"
@@ -44,4 +45,24 @@ func (_ Age) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathut
 	}
 
 	return false, nil
+}
+
+func (_ Age) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
+	params := []string{
+		"--min-age",
+		fmt.Sprintf("%dm", cfg.Limit),
+	}
+
+	// add filters
+	for _, include := range cfg.Include {
+		params = append(params,
+			"--include", include)
+	}
+
+	for _, exclude := range cfg.Exclude {
+		params = append(params,
+			"--exclude", exclude)
+	}
+
+	return params
 }

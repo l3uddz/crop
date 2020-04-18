@@ -9,4 +9,5 @@ import (
 type Interface interface {
 	Check(*config.UploaderCheck, *logrus.Entry, []pathutils.Path, uint64) (bool, error)
 	CheckFile(*config.UploaderCheck, *logrus.Entry, pathutils.Path, uint64) (bool, error)
+	RcloneParams(check *config.UploaderCheck, entry *logrus.Entry) []string
 }

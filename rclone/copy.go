@@ -10,32 +10,38 @@ import (
 
 /* Public */
 
-func Copy(u *config.UploaderConfig, localPath string, remotePath string, serviceAccountFile *pathutils.Path) (bool, int, error) {
+func Copy(u *config.UploaderConfig, from string, to string, serviceAccountFile *pathutils.Path,
+	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action":      CMD_COPY,
-		"local_path":  localPath,
-		"remote_path": remotePath,
+		"action": CMD_COPY,
+		"from":   from,
+		"to":     to,
 	})
 	result := false
 
 	// generate required rclone parameters
 	params := []string{
 		CMD_COPY,
-		localPath,
-		remotePath,
+		from,
+		to,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating baseParams to %q: %q -> %q",
-			CMD_COPY, localPath, remotePath)
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q -> %q",
+			CMD_COPY, from, to)
 	} else {
 		params = append(params, baseParams...)
 	}
 
-	if additionalParams, err := getAdditionalParams(CMD_COPY, u.RcloneParams.Copy); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating additionalParams to %q: %q -> %q",
-			CMD_COPY, localPath, remotePath)
+	extraParams := u.RcloneParams.Copy
+	if additionalRcloneParams != nil {
+		extraParams = append(extraParams, additionalRcloneParams...)
+	}
+
+	if additionalParams, err := getAdditionalParams(CMD_COPY, extraParams); err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",
+			CMD_COPY, from, to)
 	} else {
 		params = append(params, additionalParams...)
 	}

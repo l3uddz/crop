@@ -10,13 +10,11 @@ import (
 	"time"
 )
 
-func (u *Uploader) Copy() error {
+func (u *Uploader) Copy(additionalRcloneParams []string) error {
 	// iterate all remotes and run copy
 	for _, remotePath := range u.Config.Remotes.Copy {
-		// set logic variables
+		// set variables
 		attempts := 1
-
-		// set log
 		rLog := u.Log.WithFields(logrus.Fields{
 			"copy_remote":     remotePath,
 			"copy_local_path": u.Config.LocalFolder,
@@ -48,7 +46,8 @@ func (u *Uploader) Copy() error {
 
 			// copy
 			rLog.Info("Copying...")
-			success, exitCode, err := rclone.Copy(u.Config, u.Config.LocalFolder, remotePath, serviceAccount)
+			success, exitCode, err := rclone.Copy(u.Config, u.Config.LocalFolder, remotePath, serviceAccount,
+				additionalRcloneParams)
 
 			// check result
 			if err != nil {
@@ -69,12 +68,12 @@ func (u *Uploader) Copy() error {
 			case rclone.EXIT_FATAL_ERROR:
 				// ban this service account
 				if err := cache.Set(serviceAccount.RealPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
-					rLog.WithError(err).Error("Failed banning service account, cannot proceed...")
+					rLog.WithError(err).Error("Failed banning service account, cannot try again...")
 					return fmt.Errorf("failed banning service account: %v", serviceAccount.RealPath)
 				}
 
 				// attempt copy again
-				rLog.Warnf("Copy failed with retryable exit code %v, attempting again...", exitCode)
+				rLog.Warnf("Copy failed with retryable exit code %v, trying again...", exitCode)
 				attempts++
 				continue
 			default:
