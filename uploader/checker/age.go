@@ -35,7 +35,7 @@ func (_ Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathuti
 				"file_time": path.ModifiedTime,
 				"file_path": path.Path,
 				"over_age":  humanize.RelTime(maxFileAge, path.ModifiedTime, "", ""),
-			}).Tracef("Age is greater than specified limit")
+			}).Trace("Age is greater than specified limit")
 
 			checkPassed = true
 		}
