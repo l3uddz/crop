@@ -23,7 +23,6 @@ type BuildVars struct {
 }
 
 type Configuration struct {
-	Core     CoreConfig
 	Rclone   RcloneConfig
 	Uploader map[string]UploaderConfig
 }
@@ -129,13 +128,9 @@ func setConfigDefault(key string, value interface{}, check bool) int {
 func setConfigDefaults(check bool) error {
 	added := 0
 
-	// core settings
-	added += setConfigDefault("core.workers", 8, check)
-
 	// rclone settings
 	added += setConfigDefault("rclone.path", "/usr/bin/rclone", check)
 	added += setConfigDefault("rclone.config", "/Users/l3uddz/.config/rclone/rclone.conf", check)
-	added += setConfigDefault("rclone.dryrun", true, check)
 
 	// were new settings added?
 	if check && added > 0 {

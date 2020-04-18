@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/yale8848/gorpool"
 )
 
 var uploadCmd = &cobra.Command{
@@ -104,11 +103,7 @@ func performUpload(u *uploader.Uploader) error {
 
 	/* Cleans */
 	if u.Config.Hidden.Enabled {
-		gp := gorpool.NewPool(config.Config.Core.Workers, 0).
-			Start().
-			EnableWaitForAll(true)
-
-		err := u.PerformCleans(gp)
+		err := performClean(u)
 		if err != nil {
 			return errors.Wrap(err, "failed clearing remotes")
 		}
@@ -119,23 +114,35 @@ func performUpload(u *uploader.Uploader) error {
 
 	/* Copies */
 	if len(u.Config.Remotes.Copy) > 0 {
+		u.Log.Info("Running copies...")
+
 		if err := u.Copy(additionalRcloneParams); err != nil {
 			return errors.WithMessage(err, "failed performing all copies")
 		}
+
+		u.Log.Info("Finished copies!")
 	}
 
 	/* Move */
 	if len(u.Config.Remotes.Move) > 0 {
+		u.Log.Info("Running move...")
+
 		if err := u.Move(false, additionalRcloneParams); err != nil {
 			return errors.WithMessage(err, "failed performing move")
 		}
+
+		u.Log.Info("Finished move!")
 	}
 
 	/* Move Server Side */
 	if len(u.Config.Remotes.MoveServerSide) > 0 {
+		u.Log.Info("Running move server-sides...")
+
 		if err := u.Move(true, nil); err != nil {
 			return errors.WithMessage(err, "failed performing server-side moves")
 		}
+
+		u.Log.Info("Finished move server-sides!")
 	}
 
 	u.Log.Info("Finished!")

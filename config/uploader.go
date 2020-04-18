@@ -12,6 +12,7 @@ type UploaderHidden struct {
 	Type    string
 	Folder  string
 	Cleanup bool
+	Workers int
 }
 
 type UploaderRemotesMoveServerSide struct {

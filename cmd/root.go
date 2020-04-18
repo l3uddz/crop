@@ -78,6 +78,8 @@ func initCore(showAppInfo bool) {
 		log.WithError(err).Fatal("Failed to initialize config")
 	}
 
+	setConfigOverrides()
+
 	// Init Cache
 	if err := cache.Init(flagCacheFile); err != nil {
 		log.WithError(err).Fatal("Failed to initialize cache")
@@ -91,6 +93,13 @@ func initCore(showAppInfo bool) {
 	// Show App Info
 	if showAppInfo {
 		showUsing()
+	}
+}
+
+func setConfigOverrides() {
+	// set dry-run if enabled by flag
+	if flagDryRun {
+		config.Config.Rclone.DryRun = true
 	}
 }
 
