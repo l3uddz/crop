@@ -1,4 +1,4 @@
-package uploader
+package syncer
 
 import (
 	"fmt"
@@ -11,21 +11,21 @@ import (
 	"time"
 )
 
-func (u *Uploader) Copy(additionalRcloneParams []string) error {
+func (s *Syncer) Copy(additionalRcloneParams []string) error {
 	// set variables
-	copyParams := u.Config.RcloneParams.Copy
+	copyParams := s.Config.RcloneParams.Copy
 	if additionalRcloneParams != nil {
 		copyParams = append(copyParams, additionalRcloneParams...)
 	}
 
 	// iterate all remotes and run copy
-	for _, remotePath := range u.Config.Remotes.Copy {
+	for _, remotePath := range s.Config.Remotes.Copy {
 		// set variables
 		attempts := 1
-		rLog := u.Log.WithFields(logrus.Fields{
-			"copy_remote":     remotePath,
-			"copy_local_path": u.Config.LocalFolder,
-			"attempts":        attempts,
+		rLog := s.Log.WithFields(logrus.Fields{
+			"copy_remote":   remotePath,
+			"source_remote": s.Config.SourceRemote,
+			"attempts":      attempts,
 		})
 
 		// copy to remote
@@ -34,18 +34,18 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 			var serviceAccount *pathutils.Path
 			var err error
 
-			if u.ServiceAccountCount > 0 {
-				serviceAccount, err = rclone.GetAvailableServiceAccount(u.ServiceAccountFiles)
+			if s.ServiceAccountCount > 0 {
+				serviceAccount, err = rclone.GetAvailableServiceAccount(s.ServiceAccountFiles)
 				if err != nil {
 					return errors.WithMessagef(err,
 						"aborting further copy attempts of %q due to serviceAccount exhaustion",
-						u.Config.LocalFolder)
+						s.Config.SourceRemote)
 				}
 
 				// reset log
-				rLog = u.Log.WithFields(logrus.Fields{
+				rLog = s.Log.WithFields(logrus.Fields{
 					"copy_remote":     remotePath,
-					"copy_local_path": u.Config.LocalFolder,
+					"source_remote":   s.Config.SourceRemote,
 					"attempts":        attempts,
 					"service_account": serviceAccount.RealPath,
 				})
@@ -53,7 +53,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 
 			// copy
 			rLog.Info("Copying...")
-			success, exitCode, err := rclone.Copy(u.Config.LocalFolder, remotePath, serviceAccount, copyParams)
+			success, exitCode, err := rclone.Copy(s.Config.SourceRemote, remotePath, serviceAccount, copyParams)
 
 			// check result
 			if err != nil {
@@ -68,7 +68,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 			switch exitCode {
 			case rclone.EXIT_FATAL_ERROR:
 				// are we using service accounts?
-				if u.ServiceAccountCount == 0 {
+				if s.ServiceAccountCount == 0 {
 					// we are not using service accounts, so mark this remote as banned
 					if err := cache.Set(stringutils.FromLeftUntil(remotePath, ":"),
 						time.Now().UTC().Add(25*time.Hour)); err != nil {

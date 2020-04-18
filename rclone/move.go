@@ -2,7 +2,6 @@ package rclone
 
 import (
 	"github.com/go-cmd/cmd"
-	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/pathutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -10,7 +9,7 @@ import (
 
 /* Public */
 
-func Move(u *config.UploaderConfig, from string, to string, serviceAccountFile *pathutils.Path, serverSide bool,
+func Move(from string, to string, serviceAccountFile *pathutils.Path, serverSide bool,
 	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
@@ -34,15 +33,10 @@ func Move(u *config.UploaderConfig, from string, to string, serviceAccountFile *
 		params = append(params, baseParams...)
 	}
 
-	extraParams := u.RcloneParams.Move
+	extraParams := additionalRcloneParams
 	if serverSide {
-		// this is a server side move, so add any additional configured params
-		extraParams = append(extraParams, u.RcloneParams.MoveServerSide...)
 		// add server side parameter
 		extraParams = append(extraParams, "--drive-server-side-across-configs")
-	} else if additionalRcloneParams != nil {
-		// add additional params from parameters
-		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
 	if additionalParams, err := getAdditionalParams(CMD_MOVE, extraParams); err != nil {

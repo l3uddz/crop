@@ -2,7 +2,6 @@ package rclone
 
 import (
 	"github.com/go-cmd/cmd"
-	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/pathutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -10,7 +9,7 @@ import (
 
 /* Public */
 
-func Copy(u *config.UploaderConfig, from string, to string, serviceAccountFile *pathutils.Path,
+func Copy(from string, to string, serviceAccountFile *pathutils.Path,
 	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
@@ -34,10 +33,7 @@ func Copy(u *config.UploaderConfig, from string, to string, serviceAccountFile *
 		params = append(params, baseParams...)
 	}
 
-	extraParams := u.RcloneParams.Copy
-	if additionalRcloneParams != nil {
-		extraParams = append(extraParams, additionalRcloneParams...)
-	}
+	extraParams := additionalRcloneParams
 
 	if additionalParams, err := getAdditionalParams(CMD_COPY, extraParams); err != nil {
 		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",

@@ -19,6 +19,7 @@ type MoveInstruction struct {
 
 func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error {
 	var moveRemotes []MoveInstruction
+	var extraParams []string
 
 	// create move instructions
 	if serverSide {
@@ -30,6 +31,8 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 				ServerSide: true,
 			})
 		}
+
+		extraParams = u.Config.RcloneParams.MoveServerSide
 	} else {
 		// this is a normal move (to only one location)
 		moveRemotes = append(moveRemotes, MoveInstruction{
@@ -37,6 +40,13 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 			To:         u.Config.Remotes.Move,
 			ServerSide: false,
 		})
+
+		extraParams = u.Config.RcloneParams.Move
+	}
+
+	// set variables
+	if additionalRcloneParams != nil {
+		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
 	// iterate all remotes and run copy
@@ -75,8 +85,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 
 			// move
 			rLog.Info("Moving...")
-			success, exitCode, err := rclone.Move(u.Config, move.From, move.To, serviceAccount, serverSide,
-				additionalRcloneParams)
+			success, exitCode, err := rclone.Move(move.From, move.To, serviceAccount, serverSide, extraParams)
 
 			// check result
 			if err != nil {

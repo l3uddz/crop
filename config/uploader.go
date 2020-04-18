@@ -25,7 +25,6 @@ type UploaderRemotes struct {
 	Copy           []string
 	Move           string
 	MoveServerSide []UploaderRemotesMoveServerSide `mapstructure:"move_server_side"`
-	Dedupe         []string
 }
 
 type UploaderRcloneParams struct {
