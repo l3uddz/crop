@@ -57,7 +57,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 
 			if u.ServiceAccountCount > 0 && !serverSide {
 				// server side moves not supported with service account files
-				serviceAccount, err = u.getAvailableServiceAccount()
+				serviceAccount, err = rclone.GetAvailableServiceAccount(u.ServiceAccountFiles)
 				if err != nil {
 					return errors.WithMessagef(err,
 						"aborting further move attempts of %q due to serviceAccount exhaustion",

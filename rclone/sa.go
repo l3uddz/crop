@@ -1,4 +1,4 @@
-package uploader
+package rclone
 
 import (
 	"github.com/l3uddz/crop/cache"
@@ -9,11 +9,11 @@ import (
 )
 
 /* Private */
-func (u *Uploader) getAvailableServiceAccount() (*pathutils.Path, error) {
+func GetAvailableServiceAccount(serviceAccountFiles []pathutils.Path) (*pathutils.Path, error) {
 	var serviceAccountFile *pathutils.Path = nil
 
 	// find an unbanned service account
-	for _, sa := range u.ServiceAccountFiles {
+	for _, sa := range serviceAccountFiles {
 		// does the cache already contain this service account?
 		if exists, _ := cache.Get(sa.RealPath); exists {
 			// service account is currently banned
@@ -34,7 +34,7 @@ func (u *Uploader) getAvailableServiceAccount() (*pathutils.Path, error) {
 }
 
 /* Public */
-func (u *Uploader) RemotesBanned(remotes []string) (bool, time.Time) {
+func AnyRemotesBanned(remotes []string) (bool, time.Time) {
 	var banned bool
 	var expires time.Time
 

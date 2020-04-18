@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/config"
+	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/uploader"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -48,7 +49,7 @@ var uploadCmd = &cobra.Command{
 			} else {
 				// no service accounts were loaded
 				// check to see if any of the copy or move remote(s) are banned
-				banned, expiry := upload.RemotesBanned(upload.Config.Remotes.Copy)
+				banned, expiry := rclone.AnyRemotesBanned(upload.Config.Remotes.Copy)
 				if banned && !expiry.IsZero() {
 					// one of the copy remotes is banned, abort
 					upload.Log.WithFields(logrus.Fields{
@@ -58,7 +59,7 @@ var uploadCmd = &cobra.Command{
 					continue
 				}
 
-				banned, expiry = upload.RemotesBanned([]string{upload.Config.Remotes.Move})
+				banned, expiry = rclone.AnyRemotesBanned([]string{upload.Config.Remotes.Move})
 				if banned && !expiry.IsZero() {
 					// the move remote is banned, abort
 					upload.Log.WithFields(logrus.Fields{

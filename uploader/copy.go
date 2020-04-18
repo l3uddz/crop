@@ -29,7 +29,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 			var err error
 
 			if u.ServiceAccountCount > 0 {
-				serviceAccount, err = u.getAvailableServiceAccount()
+				serviceAccount, err = rclone.GetAvailableServiceAccount(u.ServiceAccountFiles)
 				if err != nil {
 					return errors.WithMessagef(err,
 						"aborting further copy attempts of %q due to serviceAccount exhaustion",
