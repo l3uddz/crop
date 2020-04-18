@@ -13,10 +13,13 @@ import (
 
 func (s *Syncer) Copy(additionalRcloneParams []string) error {
 	// set variables
-	copyParams := s.Config.RcloneParams.Copy
+	extraParams := s.Config.RcloneParams.Copy
 	if additionalRcloneParams != nil {
-		copyParams = append(copyParams, additionalRcloneParams...)
+		extraParams = append(extraParams, additionalRcloneParams...)
 	}
+
+	// add server side parameter
+	extraParams = append(extraParams, "--drive-server-side-across-configs")
 
 	// iterate all remotes and run copy
 	for _, remotePath := range s.Config.Remotes.Copy {
@@ -53,7 +56,7 @@ func (s *Syncer) Copy(additionalRcloneParams []string) error {
 
 			// copy
 			rLog.Info("Copying...")
-			success, exitCode, err := rclone.Copy(s.Config.SourceRemote, remotePath, serviceAccount, copyParams)
+			success, exitCode, err := rclone.Copy(s.Config.SourceRemote, remotePath, serviceAccount, extraParams)
 
 			// check result
 			if err != nil {
