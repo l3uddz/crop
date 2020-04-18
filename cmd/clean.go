@@ -6,14 +6,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/yale8848/gorpool"
+	"strings"
 )
 
 var cleanCmd = &cobra.Command{
-	Use:   "clean [UPLOADER]",
-	Short: "Perform uploader clean",
-	Long:  `This command can be used to trigger an uploader clean.`,
+	Use:   "clean",
+	Short: "Perform cleans associated to uploader(s)",
+	Long:  `This command can be used to trigger a clean associated with uploader(s).`,
 
-	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(true)
@@ -23,6 +23,13 @@ var cleanCmd = &cobra.Command{
 			// skip disabled uploader(s)
 			if !uploaderConfig.Enabled {
 				log.WithField("uploader", uploaderName).Trace("Skipping disabled uploader")
+				continue
+			}
+
+			// skip uploader specific chosen
+			if flagUploader != "" && !strings.EqualFold(uploaderName, flagUploader) {
+				log.WithField("uploader", uploaderName).Tracef("Skipping uploader as not: %q",
+					flagUploader)
 				continue
 			}
 
@@ -49,6 +56,8 @@ var cleanCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(cleanCmd)
+
+	cleanCmd.Flags().StringVarP(&flagUploader, "uploader", "u", "", "Run for a specific uploader.")
 }
 
 func performClean(u *uploader.Uploader) error {

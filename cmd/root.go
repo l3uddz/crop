@@ -25,6 +25,9 @@ var (
 
 	flagDryRun bool
 
+	// Global command specific
+	flagUploader string
+
 	// Global vars
 	log *logrus.Entry
 )
