@@ -92,11 +92,7 @@ var uploadCmd = &cobra.Command{
 				upload.Log.WithError(err).Error("Error occurred while running uploader, skipping...")
 				continue
 			}
-
-			// clean local upload folder of empty directories
-			upload.Log.Debug("Cleaning empty local directories...")
 		}
-
 	},
 }
 
