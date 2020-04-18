@@ -2,10 +2,10 @@ package uploader
 
 import (
 	"fmt"
-	"github.com/gobwas/glob"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/pathutils"
+	"github.com/l3uddz/crop/reutils"
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/l3uddz/crop/uploader/checker"
 	"github.com/l3uddz/crop/uploader/cleaner"
@@ -26,8 +26,8 @@ type Uploader struct {
 	Checker checker.Interface
 	Cleaner cleaner.Interface
 
-	IncludePatterns []glob.Glob
-	ExcludePatterns []glob.Glob
+	IncludePatterns []*regexp.Regexp
+	ExcludePatterns []*regexp.Regexp
 
 	ServiceAccountFiles []pathutils.Path
 	ServiceAccountCount int
@@ -68,10 +68,10 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 	}
 
 	// - include patterns
-	var includePatterns []glob.Glob
+	var includePatterns []*regexp.Regexp
 
 	for _, includePattern := range uploaderConfig.Check.Include {
-		if g, err := glob.Compile(includePattern); err != nil {
+		if g, err := reutils.GlobToRegexp(includePattern, false); err != nil {
 			return nil, fmt.Errorf("invalid include pattern: %q", includePattern)
 		} else {
 			includePatterns = append(includePatterns, g)
@@ -79,10 +79,10 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 	}
 
 	// - exclude patterns
-	var excludePatterns []glob.Glob
+	var excludePatterns []*regexp.Regexp
 
 	for _, excludePattern := range uploaderConfig.Check.Exclude {
-		if g, err := glob.Compile(excludePattern); err != nil {
+		if g, err := reutils.GlobToRegexp(excludePattern, false); err != nil {
 			return nil, fmt.Errorf("invalid exclude pattern: %q", excludePattern)
 		} else {
 			excludePatterns = append(excludePatterns, g)

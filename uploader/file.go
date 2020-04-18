@@ -19,12 +19,12 @@ func (u *Uploader) RefreshLocalFiles() error {
 	// retrieve files
 	u.LocalFiles, u.LocalFilesSize = pathutils.GetPathsInFolder(u.Config.LocalFolder, true, false,
 		func(path string) *string {
-			lowerPath := strings.ToLower(path)
+			rcloneStylePath := strings.TrimLeft(strings.Replace(path, u.Config.LocalFolder, "", 1), "/")
 
 			// should this path be excluded?
 			if len(u.ExcludePatterns) > 0 {
 				for _, excludePattern := range u.ExcludePatterns {
-					if excludePattern.Match(lowerPath) {
+					if excludePattern.MatchString(rcloneStylePath) {
 						// this path matches an exclude pattern
 						return nil
 					}
@@ -34,7 +34,7 @@ func (u *Uploader) RefreshLocalFiles() error {
 			// should this path be included?
 			if len(u.Config.Check.Include) > 0 {
 				for _, includePattern := range u.IncludePatterns {
-					if includePattern.Match(lowerPath) {
+					if includePattern.MatchString(rcloneStylePath) {
 						// this path matches an include pattern
 						return &path
 					}
