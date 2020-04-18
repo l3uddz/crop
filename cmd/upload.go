@@ -7,33 +7,38 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var uploadCmd = &cobra.Command{
-	Use:   "upload [UPLOADER]",
-	Short: "Perform uploader task",
-	Long:  `This command can be used to trigger an uploader check / upload.`,
+	Use:   "upload",
+	Short: "Perform uploader task(s)",
+	Long:  `This command can be used to trigger an uploader check, clean & upload.`,
 
-	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(true)
 
 		// iterate uploader's
 		for uploaderName, uploaderConfig := range config.Config.Uploader {
+			log := log.WithField("uploader", uploaderName)
+
 			// skip disabled uploader(s)
 			if !uploaderConfig.Enabled {
-				log.WithField("uploader", uploaderName).Trace("Skipping disabled uploader")
+				log.Debug("Skipping disabled uploader")
 				continue
 			}
 
-			log := log.WithField("uploader", uploaderName)
+			// skip uploader specific chosen
+			if flagUploader != "" && !strings.EqualFold(uploaderName, flagUploader) {
+				log.Debugf("Skipping uploader as not: %q", flagUploader)
+				continue
+			}
 
 			// create uploader
 			upload, err := uploader.New(config.Config, &uploaderConfig, uploaderName)
 			if err != nil {
-				log.WithField("uploader", uploaderName).WithError(err).
-					Error("Failed initializing uploader, skipping...")
+				log.WithError(err).Error("Failed initializing uploader, skipping...")
 				continue
 			}
 
@@ -96,6 +101,8 @@ var uploadCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
+
+	uploadCmd.Flags().StringVarP(&flagUploader, "uploader", "u", "", "Run for a specific uploader")
 }
 
 func performUpload(u *uploader.Uploader) error {

@@ -11,7 +11,7 @@ import (
 
 var cleanCmd = &cobra.Command{
 	Use:   "clean",
-	Short: "Perform cleans associated to uploader(s)",
+	Short: "Perform cleans associated with uploader(s)",
 	Long:  `This command can be used to trigger a clean associated with uploader(s).`,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -20,26 +20,24 @@ var cleanCmd = &cobra.Command{
 
 		// iterate uploader's
 		for uploaderName, uploaderConfig := range config.Config.Uploader {
+			log := log.WithField("uploader", uploaderName)
+
 			// skip disabled uploader(s)
 			if !uploaderConfig.Enabled {
-				log.WithField("uploader", uploaderName).Trace("Skipping disabled uploader")
+				log.Debug("Skipping disabled uploader")
 				continue
 			}
 
 			// skip uploader specific chosen
 			if flagUploader != "" && !strings.EqualFold(uploaderName, flagUploader) {
-				log.WithField("uploader", uploaderName).Tracef("Skipping uploader as not: %q",
-					flagUploader)
+				log.Debugf("Skipping uploader as not: %q", flagUploader)
 				continue
 			}
-
-			log := log.WithField("uploader", uploaderName)
 
 			// create uploader
 			upload, err := uploader.New(config.Config, &uploaderConfig, uploaderName)
 			if err != nil {
-				log.WithField("uploader", uploaderName).WithError(err).
-					Error("Failed initializing uploader, skipping...")
+				log.WithError(err).Error("Failed initializing uploader, skipping...")
 				continue
 			}
 
@@ -57,7 +55,7 @@ var cleanCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(cleanCmd)
 
-	cleanCmd.Flags().StringVarP(&flagUploader, "uploader", "u", "", "Run for a specific uploader.")
+	cleanCmd.Flags().StringVarP(&flagUploader, "uploader", "u", "", "Run for a specific uploader")
 }
 
 func performClean(u *uploader.Uploader) error {
