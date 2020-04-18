@@ -94,27 +94,27 @@ func performSync(s *syncer.Syncer) error {
 		s.Log.Info("Finished copies!")
 	}
 
-	///* Move */
-	//if len(u.Config.Remotes.Move) > 0 {
-	//	u.Log.Info("Running move...")
-	//
-	//	if err := u.Move(false, additionalRcloneParams); err != nil {
-	//		return errors.WithMessage(err, "failed performing move")
-	//	}
-	//
-	//	u.Log.Info("Finished move!")
-	//}
-	//
-	///* Move Server Side */
-	//if len(u.Config.Remotes.MoveServerSide) > 0 {
-	//	u.Log.Info("Running move server-sides...")
-	//
-	//	if err := u.Move(true, nil); err != nil {
-	//		return errors.WithMessage(err, "failed performing server-side moves")
-	//	}
-	//
-	//	u.Log.Info("Finished move server-sides!")
-	//}
+	/* Sync */
+	if len(s.Config.Remotes.Sync) > 0 {
+		s.Log.Info("Running syncs...")
+
+		if err := s.Sync(nil); err != nil {
+			return errors.WithMessage(err, "failed performing all syncs")
+		}
+
+		s.Log.Info("Finished syncs!")
+	}
+
+	/* Move Server Side */
+	if len(s.Config.Remotes.MoveServerSide) > 0 {
+		s.Log.Info("Running move server-sides...")
+
+		if err := s.Move(nil); err != nil {
+			return errors.WithMessage(err, "failed performing server-side moves")
+		}
+
+		s.Log.Info("Finished move server-sides!")
+	}
 
 	s.Log.Info("Finished!")
 	return nil

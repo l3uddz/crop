@@ -3,6 +3,7 @@ package rclone
 const (
 	CMD_COPY        string = "copy"
 	CMD_MOVE        string = "move"
+	CMD_SYNC        string = "sync"
 	CMD_DELETE_FILE string = "deletefile"
 	CMD_DELETE_DIR  string = "rmdir"
 	CMD_DELETE_DIRS string = "rmdirs"

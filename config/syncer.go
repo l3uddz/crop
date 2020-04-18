@@ -8,7 +8,7 @@ type SyncerRemotes struct {
 
 type SyncerRcloneParams struct {
 	Copy           []string
-	Move           []string
+	Sync           []string
 	MoveServerSide []string `mapstructure:"move_server_side"`
 }
 
