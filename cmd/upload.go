@@ -149,6 +149,17 @@ func performUpload(u *uploader.Uploader) error {
 		u.Log.Info("Finished move server-sides!")
 	}
 
+	/* Dedupe */
+	if len(u.Config.Remotes.Dedupe) > 0 {
+		u.Log.Info("Running dedupes...")
+
+		if err := u.Dedupe(additionalRcloneParams); err != nil {
+			return errors.WithMessage(err, "failed performing dedupes")
+		}
+
+		u.Log.Info("Finished dupes!")
+	}
+
 	u.Log.Info("Finished!")
 	return nil
 }

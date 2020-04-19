@@ -115,17 +115,6 @@ func performSync(s *syncer.Syncer) error {
 		s.Log.Info("Finished syncs!")
 	}
 
-	/* Sync */
-	if len(s.Config.Remotes.Dedupe) > 0 {
-		s.Log.Info("Running dedupes...")
-
-		if err := s.Dedupe(nil); err != nil {
-			return errors.WithMessage(err, "failed performing all dedupes")
-		}
-
-		s.Log.Info("Finished dedupes!")
-	}
-
 	/* Move Server Side */
 	if len(s.Config.Remotes.MoveServerSide) > 0 {
 		s.Log.Info("Running move server-sides...")
@@ -135,6 +124,17 @@ func performSync(s *syncer.Syncer) error {
 		}
 
 		s.Log.Info("Finished move server-sides!")
+	}
+
+	/* Dedupe */
+	if len(s.Config.Remotes.Dedupe) > 0 {
+		s.Log.Info("Running dedupes...")
+
+		if err := s.Dedupe(nil); err != nil {
+			return errors.WithMessage(err, "failed performing all dedupes")
+		}
+
+		s.Log.Info("Finished dedupes!")
 	}
 
 	s.Log.Info("Finished!")
