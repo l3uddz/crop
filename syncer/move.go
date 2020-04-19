@@ -2,12 +2,9 @@ package syncer
 
 import (
 	"fmt"
-	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/rclone"
-	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type MoveInstruction struct {
@@ -54,12 +51,6 @@ func (s *Syncer) Move(additionalRcloneParams []string) error {
 		} else if success {
 			// successful exit code
 			continue
-		}
-
-		// ban remove
-		if err := cache.Set(stringutils.FromLeftUntil(move.To, ":"),
-			time.Now().UTC().Add(25*time.Hour)); err != nil {
-			rLog.WithError(err).Errorf("Failed banning remote")
 		}
 
 		return fmt.Errorf("move failed with exit code: %v", exitCode)

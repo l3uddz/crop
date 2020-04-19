@@ -61,6 +61,16 @@ var syncCmd = &cobra.Command{
 					}).Warn("Cannot proceed with sync as a copy remote is banned")
 					continue
 				}
+
+				banned, expiry = rclone.AnyRemotesBanned(sync.Config.Remotes.Sync)
+				if banned && !expiry.IsZero() {
+					// one of the sync remotes is banned, abort
+					sync.Log.WithFields(logrus.Fields{
+						"expires_time": expiry,
+						"expires_in":   humanize.Time(expiry),
+					}).Warn("Cannot proceed with sync as a sync remote is banned")
+					continue
+				}
 			}
 
 			log.Info("Syncer commencing...")
