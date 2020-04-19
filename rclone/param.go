@@ -57,10 +57,7 @@ func getAdditionalParams(cmd string, extraParams []string) ([]string, error) {
 	case CMD_DELETE_DIRS:
 		break
 	case CMD_DEDUPE:
-		params = append(params,
-			// tpslimit
-			"--tpslimit", "5",
-		)
+		break
 	default:
 		break
 	}
