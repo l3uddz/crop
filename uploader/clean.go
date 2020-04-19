@@ -55,11 +55,11 @@ func (u *Uploader) Clean(path *pathutils.Path) error {
 			u.Log.
 				WithField("clean_local_path", path.RealPath).
 				WithError(err).
-				Error("Error")
+				Error("Failed")
 		} else {
 			u.Log.
 				WithField("clean_local_path", path.RealPath).
-				Debug("Removed")
+				Info("Removed")
 		}
 	}
 	return nil
