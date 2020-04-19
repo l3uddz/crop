@@ -7,18 +7,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type MoveInstruction struct {
-	From       string
-	To         string
-	ServerSide bool
-}
-
 func (s *Syncer) Move(additionalRcloneParams []string) error {
-	var moveRemotes []MoveInstruction
+	var moveRemotes []rclone.RemoteInstruction
 
 	// set variables
 	for _, remote := range s.Config.Remotes.MoveServerSide {
-		moveRemotes = append(moveRemotes, MoveInstruction{
+		moveRemotes = append(moveRemotes, rclone.RemoteInstruction{
 			From:       remote.From,
 			To:         remote.To,
 			ServerSide: true,

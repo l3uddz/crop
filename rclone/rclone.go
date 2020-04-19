@@ -12,6 +12,14 @@ var (
 	cfg *config.Configuration
 )
 
+/* Struct */
+
+type RemoteInstruction struct {
+	From       string
+	To         string
+	ServerSide bool
+}
+
 /* Public */
 
 func Init(c *config.Configuration) error {

@@ -11,21 +11,15 @@ import (
 	"time"
 )
 
-type MoveInstruction struct {
-	From       string
-	To         string
-	ServerSide bool
-}
-
 func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error {
-	var moveRemotes []MoveInstruction
+	var moveRemotes []rclone.RemoteInstruction
 	var extraParams []string
 
 	// create move instructions
 	if serverSide {
 		// this is a server side move
 		for _, remote := range u.Config.Remotes.MoveServerSide {
-			moveRemotes = append(moveRemotes, MoveInstruction{
+			moveRemotes = append(moveRemotes, rclone.RemoteInstruction{
 				From:       remote.From,
 				To:         remote.To,
 				ServerSide: true,
@@ -35,7 +29,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 		extraParams = u.Config.RcloneParams.MoveServerSide
 	} else {
 		// this is a normal move (to only one location)
-		moveRemotes = append(moveRemotes, MoveInstruction{
+		moveRemotes = append(moveRemotes, rclone.RemoteInstruction{
 			From:       u.Config.LocalFolder,
 			To:         u.Config.Remotes.Move,
 			ServerSide: false,
