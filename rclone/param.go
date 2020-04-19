@@ -58,8 +58,8 @@ func getAdditionalParams(cmd string, extraParams []string) ([]string, error) {
 		break
 	case CMD_DEDUPE:
 		params = append(params,
-			// keep newest duplicate file
-			"--dedupe-mode", "newest",
+			// tpslimit
+			"--tpslimit", "5",
 		)
 	default:
 		break

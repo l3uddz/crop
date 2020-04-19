@@ -30,7 +30,7 @@ func (s *Syncer) Move(additionalRcloneParams []string) error {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
-	// iterate all remotes and run copy
+	// iterate all remotes and run move
 	for _, move := range moveRemotes {
 		// set variables
 		attempts := 1

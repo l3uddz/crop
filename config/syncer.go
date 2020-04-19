@@ -3,12 +3,14 @@ package config
 type SyncerRemotes struct {
 	Copy           []string
 	Sync           []string
+	Dedupe         []string
 	MoveServerSide []UploaderRemotesMoveServerSide `mapstructure:"move_server_side"`
 }
 
 type SyncerRcloneParams struct {
 	Copy           []string
 	Sync           []string
+	Dedupe         []string
 	MoveServerSide []string `mapstructure:"move_server_side"`
 }
 
