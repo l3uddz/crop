@@ -153,7 +153,7 @@ func performUpload(u *uploader.Uploader) error {
 	if len(u.Config.Remotes.Dedupe) > 0 {
 		u.Log.Info("Running dedupes...")
 
-		if err := u.Dedupe(additionalRcloneParams); err != nil {
+		if err := u.Dedupe(nil); err != nil {
 			return errors.WithMessage(err, "failed performing dedupes")
 		}
 
