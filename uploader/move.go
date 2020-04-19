@@ -26,7 +26,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 			})
 		}
 
-		extraParams = u.Config.RcloneParams.MoveServerSide
+		extraParams = rclone.FormattedParams(u.Config.RcloneParams.MoveServerSide)
 	} else {
 		// this is a normal move (to only one location)
 		moveRemotes = append(moveRemotes, rclone.RemoteInstruction{
@@ -35,7 +35,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 			ServerSide: false,
 		})
 
-		extraParams = u.Config.RcloneParams.Move
+		extraParams = rclone.FormattedParams(u.Config.RcloneParams.Move)
 	}
 
 	// set variables

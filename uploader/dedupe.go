@@ -8,7 +8,7 @@ import (
 )
 
 func (u *Uploader) Dedupe(additionalRcloneParams []string) error {
-	extraParams := u.Config.RcloneParams.Dedupe
+	extraParams := rclone.FormattedParams(u.Config.RcloneParams.Dedupe)
 	if additionalRcloneParams != nil {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}

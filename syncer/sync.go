@@ -13,7 +13,7 @@ import (
 
 func (s *Syncer) Sync(additionalRcloneParams []string) error {
 	// set variables
-	extraParams := s.Config.RcloneParams.Sync
+	extraParams := rclone.FormattedParams(s.Config.RcloneParams.Sync)
 	if additionalRcloneParams != nil {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}

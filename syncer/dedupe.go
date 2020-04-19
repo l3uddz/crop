@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Syncer) Dedupe(additionalRcloneParams []string) error {
-	extraParams := s.Config.RcloneParams.Dedupe
+	extraParams := rclone.FormattedParams(s.Config.RcloneParams.Dedupe)
 	if additionalRcloneParams != nil {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}

@@ -19,7 +19,7 @@ func (s *Syncer) Move(additionalRcloneParams []string) error {
 		})
 	}
 
-	extraParams := s.Config.RcloneParams.MoveServerSide
+	extraParams := rclone.FormattedParams(s.Config.RcloneParams.MoveServerSide)
 	if additionalRcloneParams != nil {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}

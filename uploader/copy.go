@@ -13,9 +13,9 @@ import (
 
 func (u *Uploader) Copy(additionalRcloneParams []string) error {
 	// set variables
-	copyParams := u.Config.RcloneParams.Copy
+	extraParams := rclone.FormattedParams(u.Config.RcloneParams.Copy)
 	if additionalRcloneParams != nil {
-		copyParams = append(copyParams, additionalRcloneParams...)
+		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
 	// iterate all remotes and run copy
@@ -53,7 +53,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 
 			// copy
 			rLog.Info("Copying...")
-			success, exitCode, err := rclone.Copy(u.Config.LocalFolder, remotePath, serviceAccount, copyParams)
+			success, exitCode, err := rclone.Copy(u.Config.LocalFolder, remotePath, serviceAccount, extraParams)
 
 			// check result
 			if err != nil {
