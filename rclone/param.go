@@ -1,6 +1,7 @@
 package rclone
 
 import (
+	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/pathutils"
 )
 
@@ -20,12 +21,17 @@ func getBaseParams() ([]string, error) {
 		"--config", cfg.Rclone.Config,
 		// verbose
 		"-v",
-		// stats
-		"--stats", "30s",
 		// user-agent
 		"--user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) "+
 			"Chrome/74.0.3729.131 Safari/537.36",
 	)
+
+	// add stats
+	if config.Config.Rclone.Stats != "" {
+		params = append(params,
+			// stats
+			"--stats", "30s")
+	}
 
 	return params, nil
 }

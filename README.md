@@ -15,6 +15,7 @@ CLI tool to run upload/sync jobs with rclone.
 rclone:
   config: /home/seed/.config/rclone/rclone.conf
   path: /usr/bin/rclone
+  stats: 30s
 uploader:
   google:
     check:
