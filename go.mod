@@ -7,6 +7,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.0
+	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/json-iterator/go v1.1.9
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
@@ -27,12 +28,14 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.4.0 // indirect
+	github.com/ulikunitz/xz v0.5.7 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	github.com/yale8848/gorpool v0.1.0
-	golang.org/x/crypto v0.0.0-20200414173820-0848c9571904 // indirect
-	golang.org/x/net v0.0.0-20191109021931-daa7c04131f5 // indirect
-	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
-	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/crypto v0.0.0-20200420104511-884d27f42877 // indirect
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
+	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
+	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )
