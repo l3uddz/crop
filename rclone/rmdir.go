@@ -11,7 +11,7 @@ import (
 func RmDir(remoteFilePath string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action":      CMD_DELETE_DIR,
+		"action":      CmdDeleteDir,
 		"remote_path": remoteFilePath,
 	})
 
@@ -19,12 +19,12 @@ func RmDir(remoteFilePath string) (bool, int, error) {
 
 	// generate required rclone parameters
 	params := []string{
-		CMD_DELETE_DIR,
+		CmdDeleteDir,
 		remoteFilePath,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q", CMD_DELETE_DIR,
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q", CmdDeleteDir,
 			remoteFilePath)
 	} else {
 		params = append(params, baseParams...)
@@ -38,7 +38,7 @@ func RmDir(remoteFilePath string) (bool, int, error) {
 
 	// check status
 	switch status.Exit {
-	case EXIT_SUCCESS:
+	case ExitSuccess:
 		result = true
 	default:
 		break

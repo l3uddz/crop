@@ -13,7 +13,7 @@ func Copy(from string, to string, serviceAccountFile *pathutils.Path,
 	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action": CMD_COPY,
+		"action": CmdCopy,
 		"from":   from,
 		"to":     to,
 	})
@@ -21,23 +21,23 @@ func Copy(from string, to string, serviceAccountFile *pathutils.Path,
 
 	// generate required rclone parameters
 	params := []string{
-		CMD_COPY,
+		CmdCopy,
 		from,
 		to,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
 		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q -> %q",
-			CMD_COPY, from, to)
+			CmdCopy, from, to)
 	} else {
 		params = append(params, baseParams...)
 	}
 
 	extraParams := additionalRcloneParams
 
-	if additionalParams, err := getAdditionalParams(CMD_COPY, extraParams); err != nil {
+	if additionalParams, err := getAdditionalParams(CmdCopy, extraParams); err != nil {
 		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",
-			CMD_COPY, from, to)
+			CmdCopy, from, to)
 	} else {
 		params = append(params, additionalParams...)
 	}
@@ -87,7 +87,7 @@ func Copy(from string, to string, serviceAccountFile *pathutils.Path,
 
 	// check status
 	switch status.Exit {
-	case EXIT_SUCCESS:
+	case ExitSuccess:
 		result = true
 	default:
 		break

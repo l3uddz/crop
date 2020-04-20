@@ -11,19 +11,19 @@ import (
 func DeleteFile(remoteFilePath string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action":      CMD_DELETE_FILE,
+		"action":      CmdDeleteFile,
 		"remote_path": remoteFilePath,
 	})
 	result := false
 
 	// generate required rclone parameters
 	params := []string{
-		CMD_DELETE_FILE,
+		CmdDeleteFile,
 		remoteFilePath,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q", CMD_DELETE_FILE,
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q", CmdDeleteFile,
 			remoteFilePath)
 	} else {
 		params = append(params, baseParams...)
@@ -37,7 +37,7 @@ func DeleteFile(remoteFilePath string) (bool, int, error) {
 
 	// check status
 	switch status.Exit {
-	case EXIT_SUCCESS:
+	case ExitSuccess:
 		result = true
 	default:
 		break

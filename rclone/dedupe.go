@@ -11,27 +11,27 @@ import (
 func Dedupe(remotePath string, additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action":      CMD_DEDUPE,
+		"action":      CmdDedupe,
 		"remote_path": remotePath,
 	})
 	result := false
 
 	// generate required rclone parameters
 	params := []string{
-		CMD_DEDUPE,
+		CmdDedupe,
 		remotePath,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating baseParams to %q: %q", CMD_DEDUPE,
+		return false, 1, errors.Wrapf(err, "failed generating baseParams to %q: %q", CmdDedupe,
 			remotePath)
 	} else {
 		params = append(params, baseParams...)
 	}
 
-	if additionalParams, err := getAdditionalParams(CMD_DEDUPE, additionalRcloneParams); err != nil {
+	if additionalParams, err := getAdditionalParams(CmdDedupe, additionalRcloneParams); err != nil {
 		return false, 1, errors.Wrapf(err, "failed generating additionalParams to %s: %q",
-			CMD_DEDUPE, remotePath)
+			CmdDedupe, remotePath)
 	} else {
 		params = append(params, additionalParams...)
 	}
@@ -76,7 +76,7 @@ func Dedupe(remotePath string, additionalRcloneParams []string) (bool, int, erro
 
 	// check status
 	switch status.Exit {
-	case EXIT_SUCCESS:
+	case ExitSuccess:
 		result = true
 	default:
 		break

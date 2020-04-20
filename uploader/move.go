@@ -95,7 +95,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 
 			// is this an exit code we can retry?
 			switch exitCode {
-			case rclone.EXIT_FATAL_ERROR:
+			case rclone.ExitFatalError:
 				// are we using service accounts?
 				if u.ServiceAccountCount == 0 {
 					// we are not using service accounts, so mark this remote as banned (if non server side move)

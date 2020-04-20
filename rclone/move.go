@@ -13,7 +13,7 @@ func Move(from string, to string, serviceAccountFile *pathutils.Path, serverSide
 	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
-		"action": CMD_MOVE,
+		"action": CmdMove,
 		"from":   from,
 		"to":     to,
 	})
@@ -21,14 +21,14 @@ func Move(from string, to string, serviceAccountFile *pathutils.Path, serverSide
 
 	// generate required rclone parameters
 	params := []string{
-		CMD_MOVE,
+		CmdMove,
 		from,
 		to,
 	}
 
 	if baseParams, err := getBaseParams(); err != nil {
 		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q -> %q",
-			CMD_MOVE, from, to)
+			CmdMove, from, to)
 	} else {
 		params = append(params, baseParams...)
 	}
@@ -39,9 +39,9 @@ func Move(from string, to string, serviceAccountFile *pathutils.Path, serverSide
 		extraParams = append(extraParams, "--drive-server-side-across-configs")
 	}
 
-	if additionalParams, err := getAdditionalParams(CMD_MOVE, extraParams); err != nil {
+	if additionalParams, err := getAdditionalParams(CmdMove, extraParams); err != nil {
 		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",
-			CMD_MOVE, from, to)
+			CmdMove, from, to)
 	} else {
 		params = append(params, additionalParams...)
 	}
@@ -92,7 +92,7 @@ func Move(from string, to string, serviceAccountFile *pathutils.Path, serverSide
 
 	// check status
 	switch status.Exit {
-	case EXIT_SUCCESS:
+	case ExitSuccess:
 		result = true
 	default:
 		break

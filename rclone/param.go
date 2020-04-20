@@ -35,28 +35,28 @@ func getAdditionalParams(cmd string, extraParams []string) ([]string, error) {
 
 	// additional params based on the rclone command being used
 	switch cmd {
-	case CMD_COPY:
+	case CmdCopy:
 		params = append(params,
 			// stop on upload limit
 			"--drive-stop-on-upload-limit",
 		)
-	case CMD_MOVE:
+	case CmdMove:
 		params = append(params,
 			// stop on upload limit
 			"--drive-stop-on-upload-limit",
 		)
-	case CMD_SYNC:
+	case CmdSync:
 		params = append(params,
 			// stop on upload limit
 			"--drive-stop-on-upload-limit",
 		)
-	case CMD_DELETE_FILE:
+	case CmdDeleteFile:
 		break
-	case CMD_DELETE_DIR:
+	case CmdDeleteDir:
 		break
-	case CMD_DELETE_DIRS:
+	case CmdDeleteDirs:
 		break
-	case CMD_DEDUPE:
+	case CmdDedupe:
 		break
 	default:
 		break
