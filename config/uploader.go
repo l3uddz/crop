@@ -15,16 +15,11 @@ type UploaderHidden struct {
 	Workers int
 }
 
-type UploaderRemotesMoveServerSide struct {
-	From string
-	To   string
-}
-
 type UploaderRemotes struct {
 	Clean          []string
 	Copy           []string
 	Move           string
-	MoveServerSide []UploaderRemotesMoveServerSide `mapstructure:"move_server_side"`
+	MoveServerSide []RcloneServerSide `mapstructure:"move_server_side"`
 	Dedupe         []string
 }
 
