@@ -14,6 +14,7 @@ import (
 var (
 	flagSyncer string
 )
+
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Perform syncer task(s)",

@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+var (
+	flagNoCheck bool
+)
+
 var uploadCmd = &cobra.Command{
 	Use:   "upload",
 	Short: "Perform uploader task(s)",
@@ -79,12 +83,15 @@ var uploadCmd = &cobra.Command{
 			}
 
 			// check if upload criteria met
-			if shouldUpload, err := upload.Check(); err != nil {
-				upload.Log.WithError(err).Error("Failed checking if uploader check conditions met, skipping...")
-				continue
-			} else if !shouldUpload {
-				upload.Log.Info("Upload conditions not met, skipping...")
-				continue
+			if !flagNoCheck {
+				// no check was not enabled
+				if shouldUpload, err := upload.Check(); err != nil {
+					upload.Log.WithError(err).Error("Failed checking if uploader check conditions met, skipping...")
+					continue
+				} else if !shouldUpload {
+					upload.Log.Info("Upload conditions not met, skipping...")
+					continue
+				}
 			}
 
 			// perform upload
@@ -100,6 +107,8 @@ func init() {
 	rootCmd.AddCommand(uploadCmd)
 
 	uploadCmd.Flags().StringVarP(&flagUploader, "uploader", "u", "", "Run for a specific uploader")
+
+	uploadCmd.Flags().BoolVar(&flagNoCheck, "no-check", false, "Ignore check and run")
 }
 
 func performUpload(u *uploader.Uploader) error {
@@ -114,7 +123,11 @@ func performUpload(u *uploader.Uploader) error {
 	}
 
 	/* Generate Additional Rclone Params */
-	additionalRcloneParams := u.CheckRcloneParams()
+	var additionalRcloneParams []string
+
+	if !flagNoCheck {
+		additionalRcloneParams = u.CheckRcloneParams()
+	}
 
 	/* Copies */
 	if len(u.Config.Remotes.Copy) > 0 {
