@@ -30,7 +30,7 @@ func getBaseParams() ([]string, error) {
 	if config.Config.Rclone.Stats != "" {
 		params = append(params,
 			// stats
-			"--stats", "30s")
+			"--stats", config.Config.Rclone.Stats)
 	}
 
 	return params, nil
