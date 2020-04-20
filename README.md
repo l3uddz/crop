@@ -76,7 +76,7 @@ syncer:
 
 `crop clean`
 
-- Upload - Perform a uploader job(s)
+- Upload - Perform an upload job(s)
 
 `crop upload --dry-run`
 
@@ -86,7 +86,7 @@ syncer:
 
 `crop upload`
 
-- Sync - Perform a syncer job(s)
+- Sync - Perform an sync job(s)
 
 `crop sync --dry-run`
 
