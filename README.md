@@ -68,7 +68,7 @@ syncer:
 
 ## Example Commands
 
-- Clean - Perform clean for associated uploader(s).
+- Clean - Perform clean for associated uploader job(s).
 
 `crop clean --dry-run`
 
@@ -76,7 +76,7 @@ syncer:
 
 `crop clean`
 
-- Upload - Perform an upload job(s)
+- Upload - Perform uploader job(s)
 
 `crop upload --dry-run`
 
@@ -86,7 +86,7 @@ syncer:
 
 `crop upload`
 
-- Sync - Perform an sync job(s)
+- Sync - Perform syncer job(s)
 
 `crop sync --dry-run`
 
@@ -102,7 +102,7 @@ Make use of `--dry-run` and `-vv` to ensure your configuration is correct and yi
 
 ## Credits
 
-- [rclone](https://github.com/rclone/rclone) - Without this awesome tool, this project would not exist (any many others!)
+- [rclone](https://github.com/rclone/rclone) - Without this awesome tool, this project would not exist!
 
 # Donate
 
