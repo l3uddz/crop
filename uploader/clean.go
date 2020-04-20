@@ -39,13 +39,13 @@ func (u *Uploader) Clean(path *pathutils.Path) error {
 		// handle response
 		if err != nil {
 			// error removing
-			rLog.WithError(err).WithField("exit_code", exitCode).Error("Error")
+			rLog.WithError(err).WithField("exit_code", exitCode).Error("Error removing remotely")
 		} else if !success {
 			// failed
-			rLog.WithField("exit_code", exitCode).Warn("Failed")
+			rLog.WithField("exit_code", exitCode).Debugf("Failed removing remotely")
 		} else {
 			// cleaned
-			rLog.Info("Removed")
+			rLog.Info("Removed remotely")
 		}
 	}
 
@@ -55,11 +55,11 @@ func (u *Uploader) Clean(path *pathutils.Path) error {
 			u.Log.
 				WithField("clean_local_path", path.RealPath).
 				WithError(err).
-				Error("Failed")
+				Error("Failed removing locally")
 		} else {
 			u.Log.
 				WithField("clean_local_path", path.RealPath).
-				Info("Removed")
+				Info("Removed locally")
 		}
 	}
 	return nil
