@@ -13,7 +13,7 @@ import (
 
 func (u *Uploader) Copy(additionalRcloneParams []string) error {
 	// set variables
-	extraParams := rclone.FormattedParams(u.Config.RcloneParams.Copy)
+	extraParams := u.Config.RcloneParams.Copy
 	if additionalRcloneParams != nil {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
