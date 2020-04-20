@@ -29,5 +29,3 @@ func Init(c *config.Configuration) error {
 	// load service files for all uploader(s)
 	return nil
 }
-
-/* Private */

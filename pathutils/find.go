@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-/* structs */
-
 type Path struct {
 	Path             string
 	RealPath         string
@@ -19,8 +17,6 @@ type Path struct {
 	Size             int64
 	ModifiedTime     time.Time
 }
-
-/* types */
 
 type callbackAllowed func(string) *string
 

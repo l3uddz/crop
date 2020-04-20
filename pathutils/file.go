@@ -8,6 +8,8 @@ import (
 
 var log = logger.GetLogger("paths")
 
+/* Public */
+
 func GetCurrentBinaryPath() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
