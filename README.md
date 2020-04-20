@@ -68,7 +68,7 @@ syncer:
 
 ## Example Commands
 
-- Clean - Perform clean for its associated uploader(s).
+- Clean - Perform clean for associated uploader(s).
 
 `crop clean --dry-run`
 
