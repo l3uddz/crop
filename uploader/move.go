@@ -46,32 +46,30 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 	for _, move := range moveRemotes {
 		// set variables
 		attempts := 1
-		rLog := u.Log.WithFields(logrus.Fields{
-			"move_to":   move.To,
-			"move_from": move.From,
-			"attempts":  attempts,
-		})
 
 		// move to remote
 		for {
 			var serviceAccounts []*rclone.RemoteServiceAccount
 			var err error
 
-			// get service account file for non server side move
+			// set log
+			rLog := u.Log.WithFields(logrus.Fields{
+				"move_to":   move.To,
+				"move_from": move.From,
+				"attempts":  attempts,
+			})
+
+			// get service account file(s) for non server side move
 			if !serverSide {
 				serviceAccounts, err = u.RemoteServiceAccountFiles.GetServiceAccount(move.To)
 				if err != nil {
 					return errors.WithMessagef(err,
 						"aborting further copy attempts of %q due to serviceAccount exhaustion",
 						u.Config.LocalFolder)
-				} else if len(serviceAccounts) > 0 {
-					// reset log
-					rLog = u.Log.WithFields(logrus.Fields{
-						"move_to":   move.To,
-						"move_from": move.From,
-						"attempts":  attempts,
-					})
+				}
 
+				// display service accounts being used
+				if len(serviceAccounts) > 0 {
 					for _, sa := range serviceAccounts {
 						rLog.Infof("Using service account %q: %v", sa.RemoteEnvVar, sa.ServiceAccountPath)
 					}
@@ -86,11 +84,13 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 			if err != nil {
 				rLog.WithError(err).Errorf("Failed unexpectedly...")
 				return errors.WithMessagef(err, "move failed unexpectedly with exit code: %v", exitCode)
-			} else if success {
+			}
+
+			if success {
 				// successful exit code
 				break
 			} else if serverSide {
-				// server side moves not supported with service accounts
+				// server side moves will not use service accounts, so we will not retry...
 				return fmt.Errorf("failed and cannot proceed with exit code: %v", exitCode)
 			}
 
@@ -101,6 +101,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 				if len(serviceAccounts) == 0 {
 					// we are not using service accounts, so mark this remote as banned (if non server side move)
 					if !serverSide {
+						// this was not a server side move, so lets ban the remote we are moving too
 						if err := cache.Set(stringutils.FromLeftUntil(move.To, ":"),
 							time.Now().UTC().Add(25*time.Hour)); err != nil {
 							rLog.WithError(err).Errorf("Failed banning remote")
@@ -110,7 +111,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 					return fmt.Errorf("move failed with exit code: %v", exitCode)
 				}
 
-				// ban this service account
+				// ban the service account(s) used
 				for _, sa := range serviceAccounts {
 					if err := cache.Set(sa.ServiceAccountPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
 						rLog.WithError(err).Error("Failed banning service account, cannot try again...")

@@ -31,11 +31,10 @@ type UploaderRcloneParams struct {
 }
 
 type UploaderConfig struct {
-	Enabled              bool
-	Check                UploaderCheck
-	Hidden               UploaderHidden
-	LocalFolder          string `mapstructure:"local_folder"`
-	ServiceAccountFolder string `mapstructure:"sa_folder"`
-	Remotes              UploaderRemotes
-	RcloneParams         UploaderRcloneParams `mapstructure:"rclone_params"`
+	Enabled      bool
+	Check        UploaderCheck
+	Hidden       UploaderHidden
+	LocalFolder  string `mapstructure:"local_folder"`
+	Remotes      UploaderRemotes
+	RcloneParams UploaderRcloneParams `mapstructure:"rclone_params"`
 }

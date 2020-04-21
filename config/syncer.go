@@ -15,9 +15,8 @@ type SyncerRcloneParams struct {
 }
 
 type SyncerConfig struct {
-	Enabled              bool
-	ServiceAccountFolder string `mapstructure:"sa_folder"`
-	SourceRemote         string `mapstructure:"source_remote"`
-	Remotes              SyncerRemotes
-	RcloneParams         SyncerRcloneParams `mapstructure:"rclone_params"`
+	Enabled      bool
+	SourceRemote string `mapstructure:"source_remote"`
+	Remotes      SyncerRemotes
+	RcloneParams SyncerRcloneParams `mapstructure:"rclone_params"`
 }
