@@ -21,28 +21,26 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 	for _, remotePath := range u.Config.Remotes.Copy {
 		// set variables
 		attempts := 1
-		rLog := u.Log.WithFields(logrus.Fields{
-			"copy_remote":     remotePath,
-			"copy_local_path": u.Config.LocalFolder,
-			"attempts":        attempts,
-		})
 
 		// copy to remote
 		for {
-			// get service account file
+			// set log
+			rLog := u.Log.WithFields(logrus.Fields{
+				"copy_remote":     remotePath,
+				"copy_local_path": u.Config.LocalFolder,
+				"attempts":        attempts,
+			})
+
+			// get service account(s)
 			serviceAccounts, err := u.RemoteServiceAccountFiles.GetServiceAccount(remotePath)
 			if err != nil {
 				return errors.WithMessagef(err,
 					"aborting further copy attempts of %q due to serviceAccount exhaustion",
 					u.Config.LocalFolder)
-			} else if len(serviceAccounts) > 0 {
-				// reset log
-				rLog = u.Log.WithFields(logrus.Fields{
-					"copy_remote":     remotePath,
-					"copy_local_path": u.Config.LocalFolder,
-					"attempts":        attempts,
-				})
+			}
 
+			// display service account(s) being used
+			if len(serviceAccounts) > 0 {
 				for _, sa := range serviceAccounts {
 					rLog.Infof("Using service account %q: %v", sa.RemoteEnvVar, sa.ServiceAccountPath)
 				}
@@ -75,7 +73,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 					return fmt.Errorf("copy failed with exit code: %v", exitCode)
 				}
 
-				// ban service account(s)
+				// ban service account(s) used
 				for _, sa := range serviceAccounts {
 					if err := cache.Set(sa.ServiceAccountPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
 						rLog.WithError(err).Error("Failed banning service account, cannot try again...")

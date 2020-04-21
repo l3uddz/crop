@@ -42,7 +42,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
-	// iterate all remotes and run copy
+	// iterate all remotes and run move
 	for _, move := range moveRemotes {
 		// set variables
 		attempts := 1
@@ -59,13 +59,13 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 				"attempts":  attempts,
 			})
 
-			// get service account file(s) for non server side move
+			// get service account(s) for non server side move
 			if !serverSide {
 				serviceAccounts, err = u.RemoteServiceAccountFiles.GetServiceAccount(move.To)
 				if err != nil {
 					return errors.WithMessagef(err,
-						"aborting further copy attempts of %q due to serviceAccount exhaustion",
-						u.Config.LocalFolder)
+						"aborting further move attempts of %q due to serviceAccount exhaustion",
+						move.From)
 				}
 
 				// display service accounts being used
@@ -119,7 +119,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 					}
 				}
 
-				// attempt copy again
+				// attempt move again
 				rLog.Warnf("Move failed with retryable exit code %v, trying again...", exitCode)
 				attempts++
 				continue
