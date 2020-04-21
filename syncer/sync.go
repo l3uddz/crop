@@ -24,28 +24,26 @@ func (s *Syncer) Sync(additionalRcloneParams []string) error {
 	for _, remotePath := range s.Config.Remotes.Sync {
 		// set variables
 		attempts := 1
-		rLog := s.Log.WithFields(logrus.Fields{
-			"sync_remote":   remotePath,
-			"source_remote": s.Config.SourceRemote,
-			"attempts":      attempts,
-		})
 
 		// sync to remote
 		for {
+			// set log
+			rLog := s.Log.WithFields(logrus.Fields{
+				"sync_remote":   remotePath,
+				"source_remote": s.Config.SourceRemote,
+				"attempts":      attempts,
+			})
+
 			// get service account file(s)
 			serviceAccounts, err := s.RemoteServiceAccountFiles.GetServiceAccount(s.Config.SourceRemote, remotePath)
 			if err != nil {
 				return errors.WithMessagef(err,
 					"aborting further sync attempts of %q due to serviceAccount exhaustion",
 					s.Config.SourceRemote)
-			} else if len(serviceAccounts) > 0 {
-				// reset log
-				rLog = s.Log.WithFields(logrus.Fields{
-					"sync_remote":   remotePath,
-					"source_remote": s.Config.SourceRemote,
-					"attempts":      attempts,
-				})
+			}
 
+			// display service account(s) being used
+			if len(serviceAccounts) > 0 {
 				for _, sa := range serviceAccounts {
 					rLog.Infof("Using service account %q: %v", sa.RemoteEnvVar, sa.ServiceAccountPath)
 				}
