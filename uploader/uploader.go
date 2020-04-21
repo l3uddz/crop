@@ -5,14 +5,13 @@ import (
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/pathutils"
+	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/reutils"
-	"github.com/l3uddz/crop/stringutils"
 	"github.com/l3uddz/crop/uploader/checker"
 	"github.com/l3uddz/crop/uploader/cleaner"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"regexp"
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -29,8 +28,7 @@ type Uploader struct {
 	IncludePatterns []*regexp.Regexp
 	ExcludePatterns []*regexp.Regexp
 
-	ServiceAccountFiles []pathutils.Path
-	ServiceAccountCount int
+	RemoteServiceAccountFiles *rclone.ServiceAccountManager
 
 	LocalFiles     []pathutils.Path
 	LocalFilesSize uint64
@@ -89,54 +87,27 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 		}
 	}
 
-	// - service account files
-	var serviceAccountFiles []pathutils.Path
-	if uploaderConfig.ServiceAccountFolder != "" {
-		serviceAccountFiles, _ = pathutils.GetPathsInFolder(uploaderConfig.ServiceAccountFolder, true,
-			false, func(path string) *string {
-				lowerPath := strings.ToLower(path)
+	// - service account manager
+	sam := rclone.NewServiceAccountManager(config.Rclone.ServiceAccountRemotes)
 
-				// ignore non json files
-				if !strings.HasSuffix(lowerPath, ".json") {
-					return nil
-				}
+	remotePaths := append([]string{}, uploaderConfig.Remotes.Copy...)
+	remotePaths = append(remotePaths, uploaderConfig.Remotes.Move)
 
-				return &path
-			})
-
-		// sort service files
-		if len(serviceAccountFiles) > 0 {
-			re := regexp.MustCompile("[0-9]+")
-			sort.SliceStable(serviceAccountFiles, func(i, j int) bool {
-				is := stringutils.NewOrExisting(re.FindString(serviceAccountFiles[i].RealPath), "0")
-				js := stringutils.NewOrExisting(re.FindString(serviceAccountFiles[j].RealPath), "0")
-
-				in, err := strconv.Atoi(is)
-				if err != nil {
-					return false
-				}
-				jn, err := strconv.Atoi(js)
-				if err != nil {
-					return false
-				}
-
-				return in < jn
-			})
-		}
+	if err := sam.LoadServiceAccounts(remotePaths); err != nil {
+		return nil, errors.WithMessage(err, "failed initializing associated remote service accounts")
 	}
 
 	// init uploader
 	uploader := &Uploader{
-		Log:                 logger.GetLogger(uploaderName),
-		GlobalConfig:        config,
-		Config:              uploaderConfig,
-		Name:                uploaderName,
-		Checker:             chk,
-		Cleaner:             cln,
-		IncludePatterns:     includePatterns,
-		ExcludePatterns:     excludePatterns,
-		ServiceAccountFiles: serviceAccountFiles,
-		ServiceAccountCount: len(serviceAccountFiles),
+		Log:                       logger.GetLogger(uploaderName),
+		GlobalConfig:              config,
+		Config:                    uploaderConfig,
+		Name:                      uploaderName,
+		Checker:                   chk,
+		Cleaner:                   cln,
+		IncludePatterns:           includePatterns,
+		ExcludePatterns:           excludePatterns,
+		RemoteServiceAccountFiles: sam,
 	}
 
 	return uploader, nil

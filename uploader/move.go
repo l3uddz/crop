@@ -3,7 +3,6 @@ package uploader
 import (
 	"fmt"
 	"github.com/l3uddz/crop/cache"
-	"github.com/l3uddz/crop/pathutils"
 	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
@@ -55,31 +54,33 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 
 		// move to remote
 		for {
-			// get service account file
-			var serviceAccount *pathutils.Path
+			var serviceAccounts []*rclone.RemoteServiceAccount
 			var err error
 
-			if u.ServiceAccountCount > 0 && !serverSide {
-				// server side moves not supported with service account files
-				serviceAccount, err = rclone.GetAvailableServiceAccount(u.ServiceAccountFiles)
+			// get service account file for non server side move
+			if !serverSide {
+				serviceAccounts, err = u.RemoteServiceAccountFiles.GetServiceAccount(move.To)
 				if err != nil {
 					return errors.WithMessagef(err,
-						"aborting further move attempts of %q due to serviceAccount exhaustion",
-						move.From)
-				}
+						"aborting further copy attempts of %q due to serviceAccount exhaustion",
+						u.Config.LocalFolder)
+				} else if len(serviceAccounts) > 0 {
+					// reset log
+					rLog = u.Log.WithFields(logrus.Fields{
+						"move_to":   move.To,
+						"move_from": move.From,
+						"attempts":  attempts,
+					})
 
-				// reset log
-				rLog = u.Log.WithFields(logrus.Fields{
-					"move_to":         move.To,
-					"move_from":       move.From,
-					"attempts":        attempts,
-					"service_account": serviceAccount.RealPath,
-				})
+					for _, sa := range serviceAccounts {
+						rLog.Infof("Using service account %q: %v", sa.RemoteEnvVar, sa.ServiceAccountPath)
+					}
+				}
 			}
 
 			// move
 			rLog.Info("Moving...")
-			success, exitCode, err := rclone.Move(move.From, move.To, serviceAccount, serverSide, extraParams)
+			success, exitCode, err := rclone.Move(move.From, move.To, serviceAccounts, serverSide, extraParams)
 
 			// check result
 			if err != nil {
@@ -97,7 +98,7 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 			switch exitCode {
 			case rclone.ExitFatalError:
 				// are we using service accounts?
-				if u.ServiceAccountCount == 0 {
+				if len(serviceAccounts) == 0 {
 					// we are not using service accounts, so mark this remote as banned (if non server side move)
 					if !serverSide {
 						if err := cache.Set(stringutils.FromLeftUntil(move.To, ":"),
@@ -110,9 +111,11 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 				}
 
 				// ban this service account
-				if err := cache.Set(serviceAccount.RealPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
-					rLog.WithError(err).Error("Failed banning service account, cannot try again...")
-					return fmt.Errorf("failed banning service account: %v", serviceAccount.RealPath)
+				for _, sa := range serviceAccounts {
+					if err := cache.Set(sa.ServiceAccountPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
+						rLog.WithError(err).Error("Failed banning service account, cannot try again...")
+						return fmt.Errorf("failed banning service account: %v", sa.ServiceAccountPath)
+					}
 				}
 
 				// attempt copy again
