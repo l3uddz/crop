@@ -44,7 +44,6 @@ uploader:
       move_server_side:
         - '--delete-empty-src-dirs'
       dedupe:
-        - '--fast-list'
         - '--tpslimit=50'
 syncer:
   4k_movies:
