@@ -5,7 +5,7 @@ import (
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
 	"github.com/zippoxer/bow"
-	"github.com/zippoxer/bow/codec/json"
+	"github.com/zippoxer/bow/codec/msgp"
 )
 
 var (
@@ -25,7 +25,7 @@ func Init(cachePath string, logLevel int) error {
 	// set badger options
 	opts := []bow.Option{
 		// codec
-		bow.SetCodec(json.Codec{}),
+		bow.SetCodec(msgp.Codec{}),
 	}
 
 	if logLevel < 2 {
