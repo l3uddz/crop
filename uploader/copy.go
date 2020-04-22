@@ -7,7 +7,6 @@ import (
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 func (u *Uploader) Copy(additionalRcloneParams []string) error {
@@ -65,8 +64,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 				// are we using service accounts?
 				if len(serviceAccounts) > 0 {
 					// we are not using service accounts, so mark this remote as banned
-					if err := cache.Set(stringutils.FromLeftUntil(remotePath, ":"),
-						time.Now().UTC().Add(25*time.Hour)); err != nil {
+					if err := cache.SetBanned(stringutils.FromLeftUntil(remotePath, ":"), 25); err != nil {
 						rLog.WithError(err).Errorf("Failed banning remote")
 					}
 
@@ -75,7 +73,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 
 				// ban service account(s) used
 				for _, sa := range serviceAccounts {
-					if err := cache.Set(sa.ServiceAccountPath, time.Now().UTC().Add(25*time.Hour)); err != nil {
+					if err := cache.SetBanned(sa.ServiceAccountPath, 25); err != nil {
 						rLog.WithError(err).Error("Failed banning service account, cannot try again...")
 						return fmt.Errorf("failed banning service account: %v", sa.ServiceAccountPath)
 					}

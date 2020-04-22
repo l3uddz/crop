@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"github.com/blang/semver"
+	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/runtime"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
@@ -17,6 +18,7 @@ var updateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(false)
+		defer cache.Close()
 
 		// parse current version
 		v, err := semver.Parse(runtime.Version)

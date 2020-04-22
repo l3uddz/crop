@@ -20,7 +20,7 @@ var (
 	flagLogLevel     = 0
 	flagConfigFolder = pathutils.GetCurrentBinaryPath()
 	flagConfigFile   = "config.yaml"
-	flagCacheFile    = "cache.json"
+	flagCachePath    = "cache"
 	flagLogFile      = "activity.log"
 
 	flagDryRun bool
@@ -50,7 +50,7 @@ func init() {
 	// Parse persistent flags
 	rootCmd.PersistentFlags().StringVar(&flagConfigFolder, "config-dir", flagConfigFolder, "Config folder")
 	rootCmd.PersistentFlags().StringVarP(&flagConfigFile, "config", "c", flagConfigFile, "Config file")
-	rootCmd.PersistentFlags().StringVarP(&flagCacheFile, "cache", "d", flagCacheFile, "Cache file")
+	rootCmd.PersistentFlags().StringVarP(&flagCachePath, "cache", "d", flagCachePath, "Cache path")
 	rootCmd.PersistentFlags().StringVarP(&flagLogFile, "log", "l", flagLogFile, "Log file")
 	rootCmd.PersistentFlags().CountVarP(&flagLogLevel, "verbose", "v", "Verbose level")
 
@@ -63,7 +63,7 @@ func initCore(showAppInfo bool) {
 		flagConfigFile = filepath.Join(flagConfigFolder, flagConfigFile)
 	}
 	if !rootCmd.PersistentFlags().Changed("cache") {
-		flagCacheFile = filepath.Join(flagConfigFolder, flagCacheFile)
+		flagCachePath = filepath.Join(flagConfigFolder, flagCachePath)
 	}
 	if !rootCmd.PersistentFlags().Changed("log") {
 		flagLogFile = filepath.Join(flagConfigFolder, flagLogFile)
@@ -84,7 +84,7 @@ func initCore(showAppInfo bool) {
 	setConfigOverrides()
 
 	// Init Cache
-	if err := cache.Init(flagCacheFile); err != nil {
+	if err := cache.Init(flagCachePath, flagLogLevel); err != nil {
 		log.WithError(err).Fatal("Failed to initialize cache")
 	}
 

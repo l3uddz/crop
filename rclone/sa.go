@@ -151,7 +151,7 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 		// find unbanned service account
 		for _, sa := range remote.ServiceAccounts {
 			// does the cache already contain this service account?
-			if exists, _ := cache.Get(sa.RealPath); exists {
+			if exists, _ := cache.IsBanned(sa.RealPath); exists {
 				// service account is currently banned
 				continue
 			}
@@ -208,7 +208,7 @@ func AnyRemotesBanned(remotes []string) (bool, time.Time) {
 
 	// iterate remotes
 	for _, remote := range checkRemotes {
-		banned, expires = cache.Get(remote)
+		banned, expires = cache.IsBanned(remote)
 		if banned {
 			break
 		}

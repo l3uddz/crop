@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/dustin/go-humanize"
+	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/uploader"
@@ -23,6 +24,7 @@ var uploadCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(true)
+		defer cache.Close()
 
 		// iterate uploader's
 		for uploaderName, uploaderConfig := range config.Config.Uploader {
