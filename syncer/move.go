@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Syncer) Move(additionalRcloneParams []string) error {
-	var moveRemotes []rclone.RemoteInstruction
+	moveRemotes := make([]rclone.RemoteInstruction, 0)
 
 	// set variables
 	for _, remote := range s.Config.Remotes.MoveServerSide {

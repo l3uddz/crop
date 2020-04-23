@@ -201,7 +201,7 @@ func AnyRemotesBanned(remotes []string) (bool, time.Time) {
 	}
 
 	// format remotes into remote names if possible
-	var checkRemotes []string
+	checkRemotes := make([]string, 0)
 	for _, remote := range remotes {
 		checkRemotes = append(checkRemotes, stringutils.FromLeftUntil(remote, ":"))
 	}
