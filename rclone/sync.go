@@ -26,22 +26,22 @@ func Sync(from string, to string, serviceAccounts []*RemoteServiceAccount,
 		to,
 	}
 
-	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q -> %q",
+	baseParams, err := getBaseParams()
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %s: %q -> %q",
 			CmdSync, from, to)
-	} else {
-		params = append(params, baseParams...)
 	}
 
+	params = append(params, baseParams...)
 	extraParams := additionalRcloneParams
 
-	if additionalParams, err := getAdditionalParams(CmdSync, extraParams); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",
+	additionalParams, err := getAdditionalParams(CmdSync, extraParams)
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %s: %q -> %q",
 			CmdSync, from, to)
-	} else {
-		params = append(params, additionalParams...)
 	}
 
+	params = append(params, additionalParams...)
 	rLog.Debugf("Generated params: %v", params)
 
 	// generate required rclone env

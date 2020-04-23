@@ -36,13 +36,14 @@ func (u *Uploader) Clean(path *pathutils.Path) error {
 		}
 
 		// handle response
-		if err != nil {
+		switch {
+		case err != nil:
 			// error removing
 			rLog.WithError(err).WithField("exit_code", exitCode).Error("Error removing remotely")
-		} else if !success {
+		case !success:
 			// failed
 			rLog.WithField("exit_code", exitCode).Debug("Failed removing remotely")
-		} else {
+		default:
 			// cleaned
 			rLog.Info("Removed remotely")
 		}

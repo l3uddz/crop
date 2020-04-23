@@ -16,6 +16,7 @@ func (u *Uploader) PerformCleans(gp *gorpool.Pool) error {
 	// perform clean files
 	if len(u.HiddenFiles) > 0 {
 		u.Log.Info("Performing clean of hidden files...")
+
 		for _, path := range u.HiddenFiles {
 			p := path
 

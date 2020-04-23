@@ -40,6 +40,7 @@ func Init(cachePath string, logLevel int) error {
 	}
 
 	db = v
+
 	return nil
 }
 

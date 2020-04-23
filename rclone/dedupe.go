@@ -22,20 +22,21 @@ func Dedupe(remotePath string, additionalRcloneParams []string) (bool, int, erro
 		remotePath,
 	}
 
-	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating baseParams to %q: %q", CmdDedupe,
+	baseParams, err := getBaseParams()
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %s: %q", CmdDedupe,
 			remotePath)
-	} else {
-		params = append(params, baseParams...)
 	}
 
-	if additionalParams, err := getAdditionalParams(CmdDedupe, additionalRcloneParams); err != nil {
-		return false, 1, errors.Wrapf(err, "failed generating additionalParams to %s: %q",
+	params = append(params, baseParams...)
+
+	additionalParams, err := getAdditionalParams(CmdDedupe, additionalRcloneParams)
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %s: %q",
 			CmdDedupe, remotePath)
-	} else {
-		params = append(params, additionalParams...)
 	}
 
+	params = append(params, additionalParams...)
 	rLog.Debugf("Generated params: %v", params)
 
 	// setup cmd

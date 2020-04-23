@@ -28,6 +28,7 @@ var syncCmd = &cobra.Command{
 
 		// iterate syncer's
 		for syncerName, syncerConfig := range config.Config.Syncer {
+			syncerConfig := syncerConfig
 			log := log.WithField("syncer", syncerName)
 
 			// skip disabled syncer(s)

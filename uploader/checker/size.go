@@ -9,7 +9,7 @@ import (
 
 type Size struct{}
 
-func (_ Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (bool, error) {
+func (Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (bool, error) {
 	// Check Total Size
 	if size > cfg.Limit {
 		log.WithFields(logrus.Fields{
@@ -23,7 +23,7 @@ func (_ Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathut
 	return false, nil
 }
 
-func (_ Size) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathutils.Path, size uint64) (bool, error) {
+func (Size) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathutils.Path, size uint64) (bool, error) {
 	// Check Total Size
 	if size > cfg.Limit {
 		return true, nil
@@ -32,7 +32,7 @@ func (_ Size) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathu
 	return false, nil
 }
 
-func (_ Size) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
+func (Size) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
 	params := make([]string, 0)
 
 	// add filters

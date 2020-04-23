@@ -23,13 +23,13 @@ func RmDir(remoteFilePath string) (bool, int, error) {
 		remoteFilePath,
 	}
 
-	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q", CmdDeleteDir,
+	baseParams, err := getBaseParams()
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %s: %q", CmdDeleteDir,
 			remoteFilePath)
-	} else {
-		params = append(params, baseParams...)
 	}
 
+	params = append(params, baseParams...)
 	rLog.Debugf("Generated params: %v", params)
 
 	// remove file

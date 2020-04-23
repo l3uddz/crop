@@ -12,7 +12,6 @@ func GetCurrentBinaryPath() string {
 	if err != nil {
 		// get current working dir
 		if dir, err = os.Getwd(); err != nil {
-			// TODO: better handling here, this should never occur but still..
 			os.Exit(1)
 		}
 	}

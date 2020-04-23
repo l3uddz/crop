@@ -26,7 +26,8 @@ type Path struct {
 
 type callbackAllowed func(string) *string
 
-func GetPathsInFolder(folder string, includeFiles bool, includeFolders bool, acceptFn callbackAllowed) ([]Path, uint64) {
+func GetPathsInFolder(folder string, includeFiles bool, includeFolders bool, acceptFn callbackAllowed) ([]Path,
+	uint64) {
 	var paths []Path
 	var size uint64 = 0
 

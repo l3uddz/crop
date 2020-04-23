@@ -66,25 +66,27 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 	}
 
 	// - include patterns
-	var includePatterns []*regexp.Regexp
+	includePatterns := make([]*regexp.Regexp, 0)
 
 	for _, includePattern := range uploaderConfig.Check.Include {
-		if g, err := reutils.GlobToRegexp(includePattern, false); err != nil {
+		g, err := reutils.GlobToRegexp(includePattern, false)
+		if err != nil {
 			return nil, fmt.Errorf("invalid include pattern: %q", includePattern)
-		} else {
-			includePatterns = append(includePatterns, g)
 		}
+
+		includePatterns = append(includePatterns, g)
 	}
 
 	// - exclude patterns
-	var excludePatterns []*regexp.Regexp
+	excludePatterns := make([]*regexp.Regexp, 0)
 
 	for _, excludePattern := range uploaderConfig.Check.Exclude {
-		if g, err := reutils.GlobToRegexp(excludePattern, false); err != nil {
+		g, err := reutils.GlobToRegexp(excludePattern, false)
+		if err != nil {
 			return nil, fmt.Errorf("invalid exclude pattern: %q", excludePattern)
-		} else {
-			excludePatterns = append(excludePatterns, g)
 		}
+
+		excludePatterns = append(excludePatterns, g)
 	}
 
 	// - service account manager

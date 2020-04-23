@@ -20,6 +20,7 @@ var cleanCmd = &cobra.Command{
 
 		// iterate uploader's
 		for uploaderName, uploaderConfig := range config.Config.Uploader {
+			uploaderConfig := uploaderConfig
 			log := log.WithField("uploader", uploaderName)
 
 			// skip disabled uploader(s)
