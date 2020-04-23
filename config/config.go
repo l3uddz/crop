@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/json-iterator/go"
 	"os"
 
 	"github.com/l3uddz/crop/logger"
@@ -38,17 +37,10 @@ var (
 
 	// Internal
 	log          = logger.GetLogger("cfg")
-	json         = jsoniter.ConfigCompatibleWithStandardLibrary
 	newOptionLen = 0
 )
 
 /* Public */
-
-func (cfg Configuration) ToJsonString() (string, error) {
-	c := viper.AllSettings()
-	bs, err := json.MarshalIndent(c, "", "  ")
-	return string(bs), err
-}
 
 func Init(configFilePath string) error {
 	// set package variables
@@ -101,7 +93,6 @@ func Init(configFilePath string) error {
 
 func ShowUsing() {
 	log.Infof("Using %s = %q", stringutils.LeftJust("CONFIG", " ", 10), cfgPath)
-
 }
 
 /* Private */

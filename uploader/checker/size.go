@@ -10,7 +10,6 @@ import (
 type Size struct{}
 
 func (_ Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (bool, error) {
-
 	// Check Total Size
 	if size > cfg.Limit {
 		log.WithFields(logrus.Fields{
@@ -25,7 +24,6 @@ func (_ Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathut
 }
 
 func (_ Size) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathutils.Path, size uint64) (bool, error) {
-
 	// Check Total Size
 	if size > cfg.Limit {
 		return true, nil

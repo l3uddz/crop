@@ -1,12 +1,9 @@
 package pathutils
 
 import (
-	"github.com/l3uddz/crop/logger"
 	"os"
 	"path/filepath"
 )
-
-var log = logger.GetLogger("paths")
 
 /* Public */
 

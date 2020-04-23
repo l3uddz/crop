@@ -40,7 +40,6 @@ func IsBanned(key string) (bool, time.Time) {
 
 	// this key is still banned
 	return true, item.Expires
-
 }
 
 func SetBanned(key string, hours int) error {

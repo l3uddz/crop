@@ -1,10 +1,16 @@
 package pathutils
 
 import (
+	"github.com/l3uddz/crop/logger"
+
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+)
+
+var (
+	log = logger.GetLogger("paths")
 )
 
 type Path struct {
@@ -47,12 +53,13 @@ func GetPathsInFolder(folder string, includeFiles bool, includeFolders bool, acc
 		}
 
 		if acceptFn != nil {
-			if acceptedPath := acceptFn(path); acceptedPath == nil {
+			acceptedPath := acceptFn(path)
+			if acceptedPath == nil {
 				log.Tracef("Skipping rejected path: %s", path)
 				return nil
-			} else {
-				finalPath = *acceptedPath
 			}
+
+			finalPath = *acceptedPath
 		}
 
 		foundPath := Path{
@@ -70,7 +77,6 @@ func GetPathsInFolder(folder string, includeFiles bool, includeFolders bool, acc
 		size += uint64(info.Size())
 
 		return nil
-
 	})
 
 	if err != nil {
