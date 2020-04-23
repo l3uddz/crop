@@ -17,7 +17,6 @@ func (u *Uploader) Clean(path *pathutils.Path) error {
 
 		// set log
 		rLog := u.Log.WithFields(logrus.Fields{
-			"clean_remote":      remotePath,
 			"clean_local_path":  path.RealPath,
 			"clean_remote_path": cleanRemotePath,
 		})
