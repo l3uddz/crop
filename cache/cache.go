@@ -5,7 +5,6 @@ import (
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
 	"github.com/zippoxer/bow"
-	"github.com/zippoxer/bow/codec/msgp"
 )
 
 var (
@@ -23,10 +22,7 @@ func Init(cachePath string, logLevel int) error {
 	cacheFilePath = cachePath
 
 	// set badger options
-	opts := []bow.Option{
-		// codec
-		bow.SetCodec(msgp.Codec{}),
-	}
+	opts := make([]bow.Option, 0)
 
 	if logLevel < 2 {
 		// disable badger logging for non trace log level
