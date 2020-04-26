@@ -47,7 +47,7 @@ vendor_update: ## Update vendor dependencies
 	${MAKE} vendor
 
 .PHONY: build
-build: fetch ${BUILD_PATH}/${CMD} ## Build application
+build: vendor ${BUILD_PATH}/${CMD} ## Build application
 
 # Binary
 ${BUILD_PATH}/${CMD}: ${GO_FILES} go.sum
@@ -73,15 +73,15 @@ fetch: ## Fetch vendor files
 	go mod vendor
 
 .PHONY: release
-release: check_goreleaser vendor ## Generate a release, but don't publish
+release: check_goreleaser #fetch ## Generate a release, but don't publish
 	goreleaser --skip-validate --skip-publish --rm-dist
 
 .PHONY: publish
-publish: check_goreleaser vendor ## Generate a release, and publish
+publish: check_goreleaser #fetch ## Generate a release, and publish
 	goreleaser --rm-dist
 
 .PHONY: snapshot
-snapshot: check_goreleaser fetch ## Generate a snapshot release
+snapshot: check_goreleaser #fetch ## Generate a snapshot release
 	goreleaser --snapshot --skip-validate --skip-publish --rm-dist
 
 .PHONY: help
