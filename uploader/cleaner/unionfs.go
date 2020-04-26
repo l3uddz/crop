@@ -9,7 +9,7 @@ import (
 
 type Unionfs struct{}
 
-func (_ Unionfs) FindHidden(cfg *config.UploaderHidden, log *logrus.Entry) ([]pathutils.Path, []pathutils.Path, error) {
+func (Unionfs) FindHidden(cfg *config.UploaderHidden, log *logrus.Entry) ([]pathutils.Path, []pathutils.Path, error) {
 	tLog := log.WithField("cleaner", "unionfs")
 
 	// retrieve files

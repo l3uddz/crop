@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/dustin/go-humanize"
+	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/syncer"
@@ -23,9 +24,11 @@ var syncCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(true)
+		defer cache.Close()
 
 		// iterate syncer's
 		for syncerName, syncerConfig := range config.Config.Syncer {
+			syncerConfig := syncerConfig
 			log := log.WithField("syncer", syncerName)
 
 			// skip disabled syncer(s)
@@ -47,9 +50,9 @@ var syncCmd = &cobra.Command{
 				continue
 			}
 
-			if sync.ServiceAccountCount > 0 {
-				sync.Log.WithField("found_files", sync.ServiceAccountCount).
-					Info("Loaded service accounts")
+			serviceAccountCount := sync.RemoteServiceAccountFiles.ServiceAccountsCount()
+			if serviceAccountCount > 0 {
+				sync.Log.WithField("found_files", serviceAccountCount).Info("Loaded service accounts")
 			} else {
 				// no service accounts were loaded
 				// check to see if any of the copy or move remote(s) are banned

@@ -1,15 +1,15 @@
 package rclone
 
 import (
+	"fmt"
 	"github.com/go-cmd/cmd"
-	"github.com/l3uddz/crop/pathutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 /* Public */
 
-func Sync(from string, to string, serviceAccountFile *pathutils.Path,
+func Sync(from string, to string, serviceAccounts []*RemoteServiceAccount,
 	additionalRcloneParams []string) (bool, int, error) {
 	// set variables
 	rLog := log.WithFields(logrus.Fields{
@@ -26,28 +26,38 @@ func Sync(from string, to string, serviceAccountFile *pathutils.Path,
 		to,
 	}
 
-	if baseParams, err := getBaseParams(); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %q: %q -> %q",
+	baseParams, err := getBaseParams()
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating baseParams to %s: %q -> %q",
 			CmdSync, from, to)
-	} else {
-		params = append(params, baseParams...)
 	}
 
+	params = append(params, baseParams...)
 	extraParams := additionalRcloneParams
 
-	if additionalParams, err := getAdditionalParams(CmdSync, extraParams); err != nil {
-		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %q: %q -> %q",
+	additionalParams, err := getAdditionalParams(CmdSync, extraParams)
+	if err != nil {
+		return false, 1, errors.WithMessagef(err, "failed generating additionalParams to %s: %q -> %q",
 			CmdSync, from, to)
-	} else {
-		params = append(params, additionalParams...)
 	}
 
-	if serviceAccountFile != nil {
-		saParams := getServiceAccountParams(serviceAccountFile)
-		params = append(params, saParams...)
-	}
-
+	params = append(params, additionalParams...)
 	rLog.Debugf("Generated params: %v", params)
+
+	// generate required rclone env
+	var rcloneEnv []string
+	if len(serviceAccounts) > 0 {
+		// iterate service accounts, creating env
+		for _, env := range serviceAccounts {
+			if env == nil {
+				continue
+			}
+
+			v := env
+			rcloneEnv = append(rcloneEnv, fmt.Sprintf("%s=%s", v.RemoteEnvVar, v.ServiceAccountPath))
+		}
+	}
+	rLog.Debugf("Generated rclone env: %v", rcloneEnv)
 
 	// setup cmd
 	cmdOptions := cmd.Options{
@@ -55,6 +65,7 @@ func Sync(from string, to string, serviceAccountFile *pathutils.Path,
 		Streaming: true,
 	}
 	rcloneCmd := cmd.NewCmdOptions(cmdOptions, cfg.Rclone.Path, params...)
+	rcloneCmd.Env = rcloneEnv
 
 	// live stream logs
 	doneChan := make(chan struct{})

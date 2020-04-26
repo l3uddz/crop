@@ -1,36 +1,49 @@
 package cache
 
 import (
-	jsoniter "github.com/json-iterator/go"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/stringutils"
-	"sync"
-	"time"
+	"github.com/pkg/errors"
+	"github.com/zippoxer/bow"
 )
 
 var (
 	log           = logger.GetLogger("cache")
 	cacheFilePath string
-	mtx           sync.Mutex
-	vault         map[string]time.Time
 
 	// Internal
-	json = jsoniter.ConfigCompatibleWithStandardLibrary
+	db *bow.DB
 )
 
 /* Public */
 
-func Init(cachePath string) error {
+func Init(cachePath string, logLevel int) error {
 	// set globals
 	cacheFilePath = cachePath
-	vault = make(map[string]time.Time)
 
-	// load cache from disk
-	if err := loadFromFile(cachePath); err != nil {
-		return err
+	// set badger options
+	opts := make([]bow.Option, 0)
+
+	if logLevel < 2 {
+		// disable badger logging for non trace log level
+		opts = append(opts, bow.SetLogger(nil))
 	}
 
+	// init database
+	v, err := bow.Open(cachePath, opts...)
+	if err != nil {
+		return errors.WithMessage(err, "failed opening cache")
+	}
+
+	db = v
+
 	return nil
+}
+
+func Close() {
+	if err := db.Close(); err != nil {
+		log.WithError(err).Error("Failed closing cache gracefully...")
+	}
 }
 
 func ShowUsing() {

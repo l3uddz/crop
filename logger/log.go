@@ -48,6 +48,7 @@ func Init(logLevel int, logFilePath string) error {
 		logrus.WithError(err).Errorf("Failed initializing rotating file log to %q", logFilePath)
 		return errors.Wrap(err, "failed initializing rotating file hook")
 	}
+
 	logrus.AddHook(rotateFileHook)
 
 	// set console formatter

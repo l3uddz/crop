@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/dustin/go-humanize"
+	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/uploader"
@@ -23,9 +24,11 @@ var uploadCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(true)
+		defer cache.Close()
 
 		// iterate uploader's
 		for uploaderName, uploaderConfig := range config.Config.Uploader {
+			uploaderConfig := uploaderConfig
 			log := log.WithField("uploader", uploaderName)
 
 			// skip disabled uploader(s)
@@ -47,9 +50,9 @@ var uploadCmd = &cobra.Command{
 				continue
 			}
 
-			if upload.ServiceAccountCount > 0 {
-				upload.Log.WithField("found_files", upload.ServiceAccountCount).
-					Info("Loaded service accounts")
+			serviceAccountCount := upload.RemoteServiceAccountFiles.ServiceAccountsCount()
+			if serviceAccountCount > 0 {
+				upload.Log.WithField("found_files", serviceAccountCount).Info("Loaded service accounts")
 			} else {
 				// no service accounts were loaded
 				// check to see if any of the copy or move remote(s) are banned

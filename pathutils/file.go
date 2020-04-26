@@ -1,12 +1,9 @@
 package pathutils
 
 import (
-	"github.com/l3uddz/crop/logger"
 	"os"
 	"path/filepath"
 )
-
-var log = logger.GetLogger("paths")
 
 /* Public */
 
@@ -15,7 +12,6 @@ func GetCurrentBinaryPath() string {
 	if err != nil {
 		// get current working dir
 		if dir, err = os.Getwd(); err != nil {
-			// TODO: better handling here, this should never occur but still..
 			os.Exit(1)
 		}
 	}

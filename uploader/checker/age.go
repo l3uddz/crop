@@ -11,7 +11,7 @@ import (
 
 type Age struct{}
 
-func (_ Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (bool, error) {
+func (Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (bool, error) {
 	var checkPassed bool
 	var filesPassed int
 	var filesSize int64
@@ -51,7 +51,7 @@ func (_ Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathuti
 	return checkPassed, nil
 }
 
-func (_ Age) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathutils.Path, size uint64) (bool, error) {
+func (Age) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathutils.Path, size uint64) (bool, error) {
 	maxFileAge := time.Now().Add(time.Duration(-cfg.Limit) * time.Minute)
 
 	// Check File Age
@@ -62,7 +62,7 @@ func (_ Age) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathut
 	return false, nil
 }
 
-func (_ Age) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
+func (Age) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
 	params := []string{
 		"--min-age",
 		fmt.Sprintf("%dm", cfg.Limit),
