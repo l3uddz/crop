@@ -134,6 +134,7 @@ Make use of `--dry-run` and `-vv` to ensure your configuration is correct and yi
 ## Credits
 
 - [rclone](https://github.com/rclone/rclone) - Without this awesome tool, this project would not exist!
+- [sasync](https://github.com/88lex/sasync) - Sync ideas and service account technique originated from here.
 
 # Donate
 
