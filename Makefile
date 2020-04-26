@@ -77,7 +77,7 @@ release: check_goreleaser fetch ## Generate a release, but don't publish
 	goreleaser --skip-validate --skip-publish --rm-dist
 
 .PHONY: publish
-publish: check_goreleaser fetch ## Generate a release, and publish
+publish: check_goreleaser #fetch ## Generate a release, and publish
 	goreleaser --rm-dist
 
 .PHONY: snapshot
