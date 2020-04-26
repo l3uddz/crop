@@ -6,10 +6,10 @@ import (
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/maputils"
 	"github.com/l3uddz/crop/pathutils"
+	"github.com/l3uddz/crop/reutils"
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/sirupsen/logrus"
 	"go/types"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -88,10 +88,9 @@ func (m *ServiceAccountManager) LoadServiceAccounts(remotePaths []string) error 
 		}
 
 		// sort service files
-		re := regexp.MustCompile("[0-9]+")
 		sort.SliceStable(serviceAccountFiles, func(i, j int) bool {
-			is := stringutils.NewOrExisting(re.FindString(serviceAccountFiles[i].RealPath), "0")
-			js := stringutils.NewOrExisting(re.FindString(serviceAccountFiles[j].RealPath), "0")
+			is := reutils.GetEveryNumber(serviceAccountFiles[i].RealPath)
+			js := reutils.GetEveryNumber(serviceAccountFiles[j].RealPath)
 
 			in, err := strconv.Atoi(is)
 			if err != nil {
