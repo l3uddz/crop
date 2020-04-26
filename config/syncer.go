@@ -15,6 +15,7 @@ type SyncerRcloneParams struct {
 }
 
 type SyncerConfig struct {
+	Name         string
 	Enabled      bool
 	SourceRemote string `mapstructure:"source_remote"`
 	Remotes      SyncerRemotes

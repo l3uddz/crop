@@ -19,9 +19,8 @@ var cleanCmd = &cobra.Command{
 		initCore(true)
 
 		// iterate uploader's
-		for uploaderName, uploaderConfig := range config.Config.Uploader {
-			uploaderConfig := uploaderConfig
-			log := log.WithField("uploader", uploaderName)
+		for _, uploaderConfig := range config.Config.Uploader {
+			log := log.WithField("uploader", uploaderConfig.Name)
 
 			// skip disabled uploader(s)
 			if !uploaderConfig.Enabled {
@@ -30,13 +29,13 @@ var cleanCmd = &cobra.Command{
 			}
 
 			// skip uploader specific chosen
-			if flagUploader != "" && !strings.EqualFold(uploaderName, flagUploader) {
+			if flagUploader != "" && !strings.EqualFold(uploaderConfig.Name, flagUploader) {
 				log.Debugf("Skipping uploader as not: %q", flagUploader)
 				continue
 			}
 
 			// create uploader
-			upload, err := uploader.New(config.Config, &uploaderConfig, uploaderName)
+			upload, err := uploader.New(config.Config, &uploaderConfig, uploaderConfig.Name)
 			if err != nil {
 				log.WithError(err).Error("Failed initializing uploader, skipping...")
 				continue

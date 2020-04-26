@@ -23,8 +23,8 @@ type BuildVars struct {
 
 type Configuration struct {
 	Rclone   RcloneConfig
-	Uploader map[string]UploaderConfig
-	Syncer   map[string]SyncerConfig
+	Uploader []UploaderConfig
+	Syncer   []SyncerConfig
 }
 
 /* Vars */

@@ -31,6 +31,7 @@ type UploaderRcloneParams struct {
 }
 
 type UploaderConfig struct {
+	Name         string
 	Enabled      bool
 	Check        UploaderCheck
 	Hidden       UploaderHidden

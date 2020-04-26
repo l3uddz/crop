@@ -27,9 +27,8 @@ var syncCmd = &cobra.Command{
 		defer cache.Close()
 
 		// iterate syncer's
-		for syncerName, syncerConfig := range config.Config.Syncer {
-			syncerConfig := syncerConfig
-			log := log.WithField("syncer", syncerName)
+		for _, syncerConfig := range config.Config.Syncer {
+			log := log.WithField("syncer", syncerConfig.Name)
 
 			// skip disabled syncer(s)
 			if !syncerConfig.Enabled {
@@ -38,13 +37,13 @@ var syncCmd = &cobra.Command{
 			}
 
 			// skip syncer specific chosen
-			if flagSyncer != "" && !strings.EqualFold(syncerName, flagSyncer) {
+			if flagSyncer != "" && !strings.EqualFold(syncerConfig.Name, flagSyncer) {
 				log.Debugf("Skipping syncer as not: %q", flagSyncer)
 				continue
 			}
 
 			// create syncer
-			sync, err := syncer.New(config.Config, &syncerConfig, syncerName)
+			sync, err := syncer.New(config.Config, &syncerConfig, syncerConfig.Name)
 			if err != nil {
 				log.WithError(err).Error("Failed initializing syncer, skipping...")
 				continue
