@@ -24,11 +24,11 @@ rclone:
     source_4k_movies: /opt/rclone/service_accounts/crop
     staging: /opt/rclone/service_accounts/staging
 uploader:
-  google:
+  - name: cloudbox_unionfs
+    enabled: true
     check:
       limit: 360
       type: age
-    enabled: true
     hidden:
       cleanup: true
       enabled: true
@@ -51,7 +51,7 @@ uploader:
         - '--delete-empty-src-dirs'
       dedupe:
         - '--tpslimit=50'
-  tv:
+  - name: tv
     enabled: true
     check:
       limit: 1440
@@ -64,7 +64,7 @@ uploader:
         - '--order-by=modtime,ascending'
         - '--transfers=8'
         - '--delete-empty-src-dirs'
-  movies:
+  - name: movies
     enabled: true
     check:
       limit: 720
@@ -78,7 +78,7 @@ uploader:
         - '--transfers=8'
         - '--delete-empty-src-dirs'
 syncer:
-  4k_movies:
+  - name: 4k_movies
     enabled: true
     source_remote: 'source_4k_movies:/'
     remotes:
