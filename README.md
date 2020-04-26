@@ -16,6 +16,13 @@ rclone:
   config: /home/seed/.config/rclone/rclone.conf
   path: /usr/bin/rclone
   stats: 30s
+  service_account_remotes:
+    tv: /opt/rclone/service_accounts/crop
+    movies: /opt/rclone/service_accounts/crop
+    music: /opt/rclone/service_accounts/crop
+    4k_movies: /opt/rclone/service_accounts/crop
+    source_4k_movies: /opt/rclone/service_accounts/crop
+    staging: /opt/rclone/service_accounts/staging
 uploader:
   google:
     check:
@@ -36,7 +43,6 @@ uploader:
       move_server_side:
         - from: 'staging:/Media'
           to: 'gdrive:/Media'
-    sa_folder: /opt/service_account_maker/service_accounts/crop
     rclone_params:
       move:
         - '--transfers=8'
@@ -45,10 +51,35 @@ uploader:
         - '--delete-empty-src-dirs'
       dedupe:
         - '--tpslimit=50'
+  tv:
+    enabled: true
+    check:
+      limit: 1440
+      type: age
+    local_folder: /mnt/local/Media/TV
+    remotes:
+      move: 'tv:/Media/TV'
+    rclone_params:
+      move:
+        - '--order-by=modtime,ascending'
+        - '--transfers=8'
+        - '--delete-empty-src-dirs'
+  movies:
+    enabled: true
+    check:
+      limit: 720
+      type: age
+    local_folder: /mnt/local/Media/Movies
+    remotes:
+      move: 'movies:/Media/Movies'
+    rclone_params:
+      move:
+        - '--order-by=modtime,ascending'
+        - '--transfers=8'
+        - '--delete-empty-src-dirs'
 syncer:
   4k_movies:
     enabled: true
-    sa_folder: /opt/service_account_maker/service_accounts/crop
     source_remote: 'source_4k_movies:/'
     remotes:
       sync:
