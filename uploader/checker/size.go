@@ -4,6 +4,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/pathutils"
+	"github.com/l3uddz/crop/rclone"
 	"github.com/sirupsen/logrus"
 )
 
@@ -33,18 +34,5 @@ func (Size) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathuti
 }
 
 func (Size) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
-	params := make([]string, 0)
-
-	// add filters
-	for _, include := range cfg.Include {
-		params = append(params,
-			"--include", include)
-	}
-
-	for _, exclude := range cfg.Exclude {
-		params = append(params,
-			"--exclude", exclude)
-	}
-
-	return params
+	return rclone.IncludeExcludeToFilters(cfg.Include, cfg.Exclude)
 }

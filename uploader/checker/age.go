@@ -5,6 +5,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/pathutils"
+	"github.com/l3uddz/crop/rclone"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -69,15 +70,7 @@ func (Age) RcloneParams(cfg *config.UploaderCheck, log *logrus.Entry) []string {
 	}
 
 	// add filters
-	for _, include := range cfg.Include {
-		params = append(params,
-			"--include", include)
-	}
-
-	for _, exclude := range cfg.Exclude {
-		params = append(params,
-			"--exclude", exclude)
-	}
+	params = append(params, rclone.IncludeExcludeToFilters(cfg.Include, cfg.Exclude)...)
 
 	return params
 }
