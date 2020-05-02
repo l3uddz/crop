@@ -54,7 +54,7 @@ var syncCmd = &cobra.Command{
 				sync.Log.WithField("found_files", serviceAccountCount).Info("Loaded service accounts")
 			} else {
 				// no service accounts were loaded
-				// check to see if any of the copy or move remote(s) are banned
+				// check to see if any of the copy or sync remote(s) are banned
 				banned, expiry := rclone.AnyRemotesBanned(sync.Config.Remotes.Copy)
 				if banned && !expiry.IsZero() {
 					// one of the copy remotes is banned, abort
