@@ -125,6 +125,12 @@ syncer:
 
 `crop sync`
 
+- Manual - Perform manual sync/copy job(s)
+
+`crop manual --copy --src rmeote1:/Backups --dst remote2:/Backups --sa /opt/service_accounts -- --dry-run --drive-use-trash=false`
+
+`crop manual --sync --src rmeote1:/Backups --dst remote2:/Backups --sa /opt/service_accounts --dedupe -- --drive-use-trash=false`
+
 ***
 
 ## Notes
