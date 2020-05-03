@@ -26,11 +26,11 @@ rclone:
   global_params:
     default:
       move:
-       - '--order-by=modtime,ascending'
+        - '--order-by=modtime,ascending'
         - '--transfers=8'
         - '--delete-empty-src-dirs'
       sync:
-       - '--fast-list'
+        - '--fast-list'
         - '--tpslimit-burst=50'
         - '--max-backlog=2000000'
         - '--track-renames'
@@ -39,7 +39,7 @@ rclone:
         - '--drive-chunk-size=128M'
         - '--drive-use-trash=false'
       dedupe:
-       - '--tpslimit=5'
+        - '--tpslimit=5'
 uploader:
   - name: cloudbox_unionfs
     enabled: true
