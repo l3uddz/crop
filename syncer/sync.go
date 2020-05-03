@@ -16,6 +16,10 @@ func (s *Syncer) Sync(additionalRcloneParams []string) error {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
+	if globalParams := rclone.GetGlobalParams(rclone.GlobalSyncParams, s.Config.RcloneParams.GlobalSync); globalParams != nil {
+		extraParams = append(extraParams, globalParams...)
+	}
+
 	// add server side parameter
 	extraParams = append(extraParams, "--drive-server-side-across-configs")
 

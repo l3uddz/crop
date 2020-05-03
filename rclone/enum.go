@@ -21,3 +21,13 @@ const (
 	ExitFatalError
 	ExitTransferExceeded
 )
+
+type GlobalParamType int
+
+const (
+	GlobalCopyParams GlobalParamType = iota
+	GlobalMoveParams
+	GlobalMoveServerSideParams
+	GlobalSyncParams
+	GlobalDedupeParams
+)

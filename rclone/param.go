@@ -4,6 +4,34 @@ import (
 	"github.com/l3uddz/crop/config"
 )
 
+/* Public */
+
+func GetGlobalParams(gp GlobalParamType, name string) []string {
+	var params []string
+
+	p, ok := cfg.Rclone.GlobalParams[name]
+	if !ok {
+		return params
+	}
+
+	switch gp {
+	case GlobalCopyParams:
+		params = p.Copy
+	case GlobalMoveParams:
+		params = p.Move
+	case GlobalMoveServerSideParams:
+		params = p.MoveServerSide
+	case GlobalSyncParams:
+		params = p.Sync
+	case GlobalDedupeParams:
+		params = p.Dedupe
+	default:
+		break
+	}
+
+	return params
+}
+
 /* Private */
 
 func getBaseParams() ([]string, error) {

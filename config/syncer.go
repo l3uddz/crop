@@ -8,10 +8,14 @@ type SyncerRemotes struct {
 }
 
 type SyncerRcloneParams struct {
-	Copy           []string
-	Sync           []string
-	MoveServerSide []string `mapstructure:"move_server_side"`
-	Dedupe         []string
+	Copy                 []string
+	GlobalCopy           string `mapstructure:"global_copy"`
+	Sync                 []string
+	GlobalSync           string   `mapstructure:"global_sync"`
+	MoveServerSide       []string `mapstructure:"move_server_side"`
+	GlobalMoveServerSide string   `mapstructure:"global_move_server_side"`
+	Dedupe               []string
+	GlobalDedupe         string `mapstructure:"global_dedupe"`
 }
 
 type SyncerConfig struct {

@@ -24,10 +24,14 @@ type UploaderRemotes struct {
 }
 
 type UploaderRcloneParams struct {
-	Copy           []string
-	Move           []string
-	MoveServerSide []string `mapstructure:"move_server_side"`
-	Dedupe         []string
+	Copy                 []string
+	GlobalCopy           string `mapstructure:"global_copy"`
+	Move                 []string
+	GlobalMove           string   `mapstructure:"global_move"`
+	MoveServerSide       []string `mapstructure:"move_server_side"`
+	GlobalMoveServerSide string   `mapstructure:"global_move_server_side"`
+	Dedupe               []string
+	GlobalDedupe         string `mapstructure:"global_dedupe"`
 }
 
 type UploaderConfig struct {

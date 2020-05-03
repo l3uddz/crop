@@ -23,6 +23,23 @@ rclone:
     4k_movies: /opt/rclone/service_accounts/crop
     source_4k_movies: /opt/rclone/service_accounts/crop
     staging: /opt/rclone/service_accounts/staging
+  global_params:
+    default:
+      move:
+       - '--order-by=modtime,ascending'
+        - '--transfers=8'
+        - '--delete-empty-src-dirs'
+      sync:
+       - '--fast-list'
+        - '--tpslimit-burst=50'
+        - '--max-backlog=2000000'
+        - '--track-renames'
+        - '--use-mmap'
+        - '--no-update-modtime'
+        - '--drive-chunk-size=128M'
+        - '--drive-use-trash=false'
+      dedupe:
+       - '--tpslimit=5'
 uploader:
   - name: cloudbox_unionfs
     enabled: true
@@ -44,13 +61,10 @@ uploader:
         - from: 'staging:/Media'
           to: 'gdrive:/Media'
     rclone_params:
-      move:
-        - '--transfers=8'
-        - '--delete-empty-src-dirs'
+      global_move: default
       move_server_side:
         - '--delete-empty-src-dirs'
-      dedupe:
-        - '--tpslimit=50'
+      global_dedupe: default
   - name: tv
     enabled: true
     check:
@@ -60,10 +74,7 @@ uploader:
     remotes:
       move: 'tv:/Media/TV'
     rclone_params:
-      move:
-        - '--order-by=modtime,ascending'
-        - '--transfers=8'
-        - '--delete-empty-src-dirs'
+      global_move: default
   - name: movies
     enabled: true
     check:
@@ -73,10 +84,7 @@ uploader:
     remotes:
       move: 'movies:/Media/Movies'
     rclone_params:
-      move:
-        - '--order-by=modtime,ascending'
-        - '--transfers=8'
-        - '--delete-empty-src-dirs'
+      global_move: default
 syncer:
   - name: 4k_movies
     enabled: true
@@ -87,14 +95,8 @@ syncer:
       dedupe:
         - '4k_movies:/'
     rclone_params:
-      sync:
-        - '--fast-list'
-        - '--tpslimit-burst=50'
-        - '--max-backlog=2000000'
-        - '--track-renames'
-        - '--use-mmap'
-      dedupe:
-        - '--tpslimit=5'
+      global_sync: default
+      global_dedupe: default
 ```
 
 ## Example Commands

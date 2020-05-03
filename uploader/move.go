@@ -25,6 +25,9 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 		}
 
 		extraParams = u.Config.RcloneParams.MoveServerSide
+		if globalParams := rclone.GetGlobalParams(rclone.GlobalMoveServerSideParams, u.Config.RcloneParams.GlobalMoveServerSide); globalParams != nil {
+			extraParams = append(extraParams, globalParams...)
+		}
 	} else {
 		// this is a normal move (to only one location)
 		moveRemotes = append(moveRemotes, rclone.RemoteInstruction{
@@ -34,6 +37,9 @@ func (u *Uploader) Move(serverSide bool, additionalRcloneParams []string) error 
 		})
 
 		extraParams = u.Config.RcloneParams.Move
+		if globalParams := rclone.GetGlobalParams(rclone.GlobalMoveParams, u.Config.RcloneParams.GlobalMove); globalParams != nil {
+			extraParams = append(extraParams, globalParams...)
+		}
 	}
 
 	// set variables

@@ -24,6 +24,10 @@ func (s *Syncer) Move(additionalRcloneParams []string) error {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
+	if globalParams := rclone.GetGlobalParams(rclone.GlobalMoveServerSideParams, s.Config.RcloneParams.GlobalMoveServerSide); globalParams != nil {
+		extraParams = append(extraParams, globalParams...)
+	}
+
 	// iterate remotes and run move
 	for _, move := range moveRemotes {
 		// set variables

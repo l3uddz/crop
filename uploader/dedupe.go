@@ -13,6 +13,10 @@ func (u *Uploader) Dedupe(additionalRcloneParams []string) error {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
+	if globalParams := rclone.GetGlobalParams(rclone.GlobalDedupeParams, u.Config.RcloneParams.GlobalDedupe); globalParams != nil {
+		extraParams = append(extraParams, globalParams...)
+	}
+
 	// iterate all remotes and run dedupe
 	for _, dedupeRemote := range u.Config.Remotes.Dedupe {
 		// set variables

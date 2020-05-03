@@ -13,6 +13,10 @@ func (s *Syncer) Dedupe(additionalRcloneParams []string) error {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
+	if globalParams := rclone.GetGlobalParams(rclone.GlobalDedupeParams, s.Config.RcloneParams.GlobalDedupe); globalParams != nil {
+		extraParams = append(extraParams, globalParams...)
+	}
+
 	// iterate all remotes and run dedupe
 	for _, dedupeRemote := range s.Config.Remotes.Dedupe {
 		// set variables

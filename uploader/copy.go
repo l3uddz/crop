@@ -16,6 +16,10 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 		extraParams = append(extraParams, additionalRcloneParams...)
 	}
 
+	if globalParams := rclone.GetGlobalParams(rclone.GlobalCopyParams, u.Config.RcloneParams.GlobalCopy); globalParams != nil {
+		extraParams = append(extraParams, globalParams...)
+	}
+
 	// iterate all remotes and run copy
 	for _, remotePath := range u.Config.Remotes.Copy {
 		// set variables
