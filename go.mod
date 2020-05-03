@@ -10,7 +10,6 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.0
 	github.com/golang/protobuf v1.4.0 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mitchellh/mapstructure v1.3.0 // indirect
@@ -20,7 +19,7 @@ require (
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rhysd/go-github-selfupdate v1.2.2
-	github.com/sirupsen/logrus v1.5.0
+	github.com/sirupsen/logrus v1.6.0
 	github.com/sony/sonyflake v1.0.0 // indirect
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
