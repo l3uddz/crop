@@ -1,6 +1,7 @@
 package config
 
 type UploaderCheck struct {
+	Forced  bool
 	Type    string
 	Limit   uint64
 	Exclude []string

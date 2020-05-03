@@ -127,7 +127,8 @@ func performUpload(u *uploader.Uploader) error {
 	/* Generate Additional Rclone Params */
 	var additionalRcloneParams []string
 
-	if !flagNoCheck {
+	if !flagNoCheck || u.Config.Check.Forced {
+		// if no-check is false (default) or check is forced via config, include check params
 		additionalRcloneParams = u.CheckRcloneParams()
 	}
 
