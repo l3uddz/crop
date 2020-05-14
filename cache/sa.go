@@ -10,6 +10,16 @@ type Banned struct {
 	Expires time.Time
 }
 
+func ClearExpiredBans() {
+	iter := db.Bucket("banned").Iter()
+	defer iter.Close()
+
+	var page Banned
+	for iter.Next(&page) {
+		_, _ = IsBanned(page.Path)
+	}
+}
+
 func IsBanned(key string) (bool, time.Time) {
 	// check if key was found in banned bucket
 	var item Banned

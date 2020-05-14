@@ -41,6 +41,10 @@ func Init(cachePath string, logLevel int) error {
 }
 
 func Close() {
+	// clear banned sa's
+	ClearExpiredBans()
+
+	// close
 	if err := db.Close(); err != nil {
 		log.WithError(err).Error("Failed closing cache gracefully...")
 	}
