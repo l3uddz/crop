@@ -9,7 +9,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.0
-	github.com/golang/protobuf v1.4.0 // indirect
+	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mitchellh/mapstructure v1.3.0 // indirect
@@ -31,11 +31,12 @@ require (
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	github.com/yale8848/gorpool v0.1.0
 	github.com/zippoxer/bow v0.0.0-20200229231453-bf1012ae7ab9
-	golang.org/x/crypto v0.0.0-20200429183012-4b2356b1ed79 // indirect
-	golang.org/x/net v0.0.0-20200501053045-e0ff5e5a1de5 // indirect
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
+	golang.org/x/net v0.0.0-20200513185701-a91f0712d120 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
-	golang.org/x/sys v0.0.0-20200501145240-bc7a7d42d5c3 // indirect
+	golang.org/x/sys v0.0.0-20200515095857-1151b9dac4a9 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
-	gopkg.in/ini.v1 v1.55.0 // indirect
+	gopkg.in/ini.v1 v1.56.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
