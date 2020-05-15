@@ -207,7 +207,7 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 	}
 
 	// were service accounts found?
-	if len(serviceAccounts) > 0 {
+	if err == nil && len(serviceAccounts) > 0 {
 		for _, sa := range serviceAccounts {
 			psac[sa.ServiceAccountPath] = time.Now().UTC().Add(10 * time.Second)
 		}
