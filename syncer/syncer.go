@@ -18,10 +18,10 @@ type Syncer struct {
 	RemoteServiceAccountFiles *rclone.ServiceAccountManager
 }
 
-func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncerName string) (*Syncer, error) {
+func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncerName string, parallelism int) (*Syncer, error) {
 	// init syncer dependencies
 	// - service account manager
-	sam := rclone.NewServiceAccountManager(config.Rclone.ServiceAccountRemotes)
+	sam := rclone.NewServiceAccountManager(config.Rclone.ServiceAccountRemotes, parallelism)
 
 	remotePaths := append([]string{}, syncerConfig.Remotes.Copy...)
 	remotePaths = append(remotePaths, syncerConfig.Remotes.Sync...)

@@ -56,7 +56,7 @@ var syncCmd = &cobra.Command{
 			}
 
 			// create syncer
-			syncr, err := syncer.New(config.Config, &syncerConfig, syncerConfig.Name)
+			syncr, err := syncer.New(config.Config, &syncerConfig, syncerConfig.Name, flagParallelism)
 			if err != nil {
 				slog.WithError(err).Error("Failed initializing syncer, skipping...")
 				continue

@@ -33,6 +33,7 @@ type ServiceAccountManager struct {
 	log                         *logrus.Entry
 	remoteServiceAccountFolders map[string]string
 	remoteServiceAccounts       map[string]RemoteServiceAccounts
+	parallelism                 int
 }
 
 var (
@@ -46,13 +47,20 @@ func init() {
 	psac = make(map[string]time.Time)
 }
 
+func addServiceAccountsToTempCache(serviceAccounts []*RemoteServiceAccount, duration time.Duration) {
+	for _, sa := range serviceAccounts {
+		psac[sa.ServiceAccountPath] = time.Now().UTC().Add(duration)
+	}
+}
+
 /* Public */
 
-func NewServiceAccountManager(serviceAccountFolders map[string]string) *ServiceAccountManager {
+func NewServiceAccountManager(serviceAccountFolders map[string]string, parallelism int) *ServiceAccountManager {
 	return &ServiceAccountManager{
 		log:                         logger.GetLogger("sa_manager"),
 		remoteServiceAccountFolders: serviceAccountFolders,
 		remoteServiceAccounts:       make(map[string]RemoteServiceAccounts),
+		parallelism:                 parallelism,
 	}
 }
 
@@ -207,10 +215,10 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 	}
 
 	// were service accounts found?
-	if err == nil && len(serviceAccounts) > 0 {
-		for _, sa := range serviceAccounts {
-			psac[sa.ServiceAccountPath] = time.Now().UTC().Add(10 * time.Second)
-		}
+	if err == nil && m.parallelism > 1 && len(serviceAccounts) > 0 {
+		// there may be multiple routines requesting service accounts
+		// prevent service account from being re-used (unless explicitly removed by a successful operation)
+		addServiceAccountsToTempCache(serviceAccounts, 24*time.Hour)
 	}
 
 	return serviceAccounts, err
@@ -224,6 +232,15 @@ func (m *ServiceAccountManager) ServiceAccountsCount() int {
 	}
 
 	return n
+}
+
+func RemoveServiceAccountsFromTempCache(serviceAccounts []*RemoteServiceAccount) {
+	mtx.Lock()
+	defer mtx.Unlock()
+
+	for _, sa := range serviceAccounts {
+		delete(psac, sa.ServiceAccountPath)
+	}
 }
 
 func AnyRemotesBanned(remotes []string) (bool, time.Time) {

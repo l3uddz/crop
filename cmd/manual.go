@@ -109,7 +109,7 @@ var manualCmd = &cobra.Command{
 		}
 
 		// create syncer
-		sync, err := syncer.New(&cfg, &syncerConfig, syncerConfig.Name)
+		sync, err := syncer.New(&cfg, &syncerConfig, syncerConfig.Name, 1)
 		if err != nil {
 			log.WithError(err).Fatal("Failed initializing syncer, skipping...")
 		}

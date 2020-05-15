@@ -90,7 +90,7 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 	}
 
 	// - service account manager
-	sam := rclone.NewServiceAccountManager(config.Rclone.ServiceAccountRemotes)
+	sam := rclone.NewServiceAccountManager(config.Rclone.ServiceAccountRemotes, 1)
 
 	remotePaths := append([]string{}, uploaderConfig.Remotes.Copy...)
 	remotePaths = append(remotePaths, uploaderConfig.Remotes.Move)

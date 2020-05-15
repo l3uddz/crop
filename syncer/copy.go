@@ -62,6 +62,7 @@ func (s *Syncer) Copy(additionalRcloneParams []string) error {
 				return errors.WithMessagef(err, "copy failed unexpectedly with exit code: %v", exitCode)
 			} else if success {
 				// successful exit code
+				rclone.RemoveServiceAccountsFromTempCache(serviceAccounts)
 				break
 			}
 
