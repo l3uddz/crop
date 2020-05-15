@@ -28,31 +28,37 @@ var syncCmd = &cobra.Command{
 		initCore(true)
 		defer cache.Close()
 
-		// iterate syncer's
+		// create workers
 		var wg sync.WaitGroup
-		pos := 0
+		jobs := make(chan *syncer.Syncer, len(config.Config.Syncer))
 
+		for w := 1; w <= flagParallelism; w++ {
+			wg.Add(1)
+			go worker(&wg, jobs)
+		}
+
+		// iterate syncer's
 		for _, syncerConfig := range config.Config.Syncer {
 			syncerConfig := syncerConfig
 
-			log := log.WithField("syncer", syncerConfig.Name)
+			slog := log.WithField("syncer", syncerConfig.Name)
 
 			// skip disabled syncer(s)
 			if !syncerConfig.Enabled {
-				log.Debug("Skipping disabled syncer")
+				slog.Debug("Skipping disabled syncer")
 				continue
 			}
 
 			// skip syncer specific chosen
 			if flagSyncer != "" && !strings.EqualFold(syncerConfig.Name, flagSyncer) {
-				log.Debugf("Skipping syncer as not: %q", flagSyncer)
+				slog.Debugf("Skipping syncer as not: %q", flagSyncer)
 				continue
 			}
 
 			// create syncer
 			syncr, err := syncer.New(config.Config, &syncerConfig, syncerConfig.Name)
 			if err != nil {
-				log.WithError(err).Error("Failed initializing syncer, skipping...")
+				slog.WithError(err).Error("Failed initializing syncer, skipping...")
 				continue
 			}
 
@@ -83,29 +89,13 @@ var syncCmd = &cobra.Command{
 				}
 			}
 
-			pos += 1
-			log.Info("Syncer commencing...")
-
-			// perform sync
-			wg.Add(1)
-			go func(s *syncer.Syncer, w *sync.WaitGroup) {
-				defer w.Done()
-
-				// run syncer
-				if err := performSync(s); err != nil {
-					s.Log.WithError(err).Error("Error occurred while running syncer, skipping...")
-				}
-			}(syncr, &wg)
-
-			// parallelism limit reached?
-			if pos%flagParallelism == 0 {
-				log.Info("Waiting before starting next syncer")
-				wg.Wait()
-			}
+			// queue sync job
+			jobs <- syncr
 		}
 
 		// wait for all syncers to finish
 		log.Info("Waiting for syncer(s) to finish")
+		close(jobs)
 		wg.Wait()
 	},
 }
@@ -115,6 +105,17 @@ func init() {
 
 	syncCmd.Flags().StringVarP(&flagSyncer, "syncer", "s", "", "Run for a specific syncer")
 	syncCmd.Flags().IntVarP(&flagParallelism, "parallelism", "p", 1, "Max parallel syncers")
+}
+
+func worker(wg *sync.WaitGroup, jobs <-chan *syncer.Syncer) {
+	defer wg.Done()
+
+	for j := range jobs {
+		// perform syncer job
+		if err := performSync(j); err != nil {
+			j.Log.WithError(err).Error("Error occurred while running syncer, skipping...")
+		}
+	}
 }
 
 func performSync(s *syncer.Syncer) error {
