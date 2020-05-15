@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -32,6 +33,17 @@ type ServiceAccountManager struct {
 	log                         *logrus.Entry
 	remoteServiceAccountFolders map[string]string
 	remoteServiceAccounts       map[string]RemoteServiceAccounts
+}
+
+var (
+	mtx  sync.Mutex
+	psac map[string]time.Time
+)
+
+/* Private */
+
+func init() {
+	psac = make(map[string]time.Time)
 }
 
 /* Public */
@@ -123,6 +135,10 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 	var err error
 	successfulRemotes := make(map[string]*types.Nil)
 
+	// acquire global lock
+	mtx.Lock()
+	defer mtx.Unlock()
+
 	for _, remotePath := range remotePaths {
 		saFound := false
 
@@ -155,6 +171,19 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 				continue
 			}
 
+			// has this service account been issued within N seconds?
+			expiry, exists := psac[sa.RealPath]
+			switch {
+			case exists && expiry.Before(time.Now().UTC()):
+				// it was issued before, but it was not within N seconds
+				delete(psac, sa.RealPath)
+			case exists:
+				// it was issued before and it has not expired yet
+				continue
+			default:
+				break
+			}
+
 			// this service account is unbanned
 			serviceAccounts = append(serviceAccounts, &RemoteServiceAccount{
 				RemoteEnvVar:       remote.RemoteEnvVar,
@@ -175,6 +204,13 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 		m.log.Warnf("No more service accounts available for remote: %q", remoteName)
 		err = fmt.Errorf("failed finding available service account for remote: %q", remoteName)
 		break
+	}
+
+	// were service accounts found?
+	if len(serviceAccounts) > 0 {
+		for _, sa := range serviceAccounts {
+			psac[sa.ServiceAccountPath] = time.Now().UTC().Add(10 * time.Second)
+		}
 	}
 
 	return serviceAccounts, err

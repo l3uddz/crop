@@ -10,10 +10,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strings"
+	"sync"
 )
 
 var (
-	flagSyncer string
+	flagSyncer      string
+	flagParallelism int
 )
 
 var syncCmd = &cobra.Command{
@@ -27,7 +29,12 @@ var syncCmd = &cobra.Command{
 		defer cache.Close()
 
 		// iterate syncer's
+		var wg sync.WaitGroup
+		pos := 0
+
 		for _, syncerConfig := range config.Config.Syncer {
+			syncerConfig := syncerConfig
+
 			log := log.WithField("syncer", syncerConfig.Name)
 
 			// skip disabled syncer(s)
@@ -43,32 +50,32 @@ var syncCmd = &cobra.Command{
 			}
 
 			// create syncer
-			sync, err := syncer.New(config.Config, &syncerConfig, syncerConfig.Name)
+			syncr, err := syncer.New(config.Config, &syncerConfig, syncerConfig.Name)
 			if err != nil {
 				log.WithError(err).Error("Failed initializing syncer, skipping...")
 				continue
 			}
 
-			serviceAccountCount := sync.RemoteServiceAccountFiles.ServiceAccountsCount()
+			serviceAccountCount := syncr.RemoteServiceAccountFiles.ServiceAccountsCount()
 			if serviceAccountCount > 0 {
-				sync.Log.WithField("found_files", serviceAccountCount).Info("Loaded service accounts")
+				syncr.Log.WithField("found_files", serviceAccountCount).Info("Loaded service accounts")
 			} else {
 				// no service accounts were loaded
 				// check to see if any of the copy or sync remote(s) are banned
-				banned, expiry := rclone.AnyRemotesBanned(sync.Config.Remotes.Copy)
+				banned, expiry := rclone.AnyRemotesBanned(syncr.Config.Remotes.Copy)
 				if banned && !expiry.IsZero() {
 					// one of the copy remotes is banned, abort
-					sync.Log.WithFields(logrus.Fields{
+					syncr.Log.WithFields(logrus.Fields{
 						"expires_time": expiry,
 						"expires_in":   humanize.Time(expiry),
 					}).Warn("Cannot proceed with sync as a copy remote is banned")
 					continue
 				}
 
-				banned, expiry = rclone.AnyRemotesBanned(sync.Config.Remotes.Sync)
+				banned, expiry = rclone.AnyRemotesBanned(syncr.Config.Remotes.Sync)
 				if banned && !expiry.IsZero() {
 					// one of the sync remotes is banned, abort
-					sync.Log.WithFields(logrus.Fields{
+					syncr.Log.WithFields(logrus.Fields{
 						"expires_time": expiry,
 						"expires_in":   humanize.Time(expiry),
 					}).Warn("Cannot proceed with sync as a sync remote is banned")
@@ -76,14 +83,30 @@ var syncCmd = &cobra.Command{
 				}
 			}
 
+			pos += 1
 			log.Info("Syncer commencing...")
 
 			// perform sync
-			if err := performSync(sync); err != nil {
-				sync.Log.WithError(err).Error("Error occurred while running syncer, skipping...")
-				continue
+			wg.Add(1)
+			go func(s *syncer.Syncer, w *sync.WaitGroup) {
+				defer w.Done()
+
+				// run syncer
+				if err := performSync(s); err != nil {
+					s.Log.WithError(err).Error("Error occurred while running syncer, skipping...")
+				}
+			}(syncr, &wg)
+
+			// parallelism limit reached?
+			if pos%flagParallelism == 0 {
+				log.Info("Waiting before starting next syncer")
+				wg.Wait()
 			}
 		}
+
+		// wait for all syncers to finish
+		log.Info("Waiting for syncer(s) to finish")
+		wg.Wait()
 	},
 }
 
@@ -91,6 +114,7 @@ func init() {
 	rootCmd.AddCommand(syncCmd)
 
 	syncCmd.Flags().StringVarP(&flagSyncer, "syncer", "s", "", "Run for a specific syncer")
+	syncCmd.Flags().IntVarP(&flagParallelism, "parallelism", "p", 1, "Max parallel syncers")
 }
 
 func performSync(s *syncer.Syncer) error {
