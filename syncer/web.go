@@ -14,6 +14,7 @@ import (
 type WebServer struct {
 	Host       string
 	Port       int
+	Running    bool
 	app        *fiber.App
 	log        *logrus.Entry
 	syncerName string
@@ -86,10 +87,13 @@ func newWebServer(host string, log *logrus.Entry, syncerName string, sa *rclone.
 func (ws *WebServer) Run() {
 	go func() {
 		ws.log.Infof("Starting service account server on %s:%d", ws.Host, ws.Port)
+		ws.Running = true
 
 		if err := ws.app.Listen(fmt.Sprintf("%s:%d", ws.Host, ws.Port)); err != nil {
 			ws.log.WithError(err).Error("Service account server failed...")
 		}
+
+		ws.Running = false
 	}()
 }
 
