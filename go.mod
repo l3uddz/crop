@@ -9,6 +9,8 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.0
+	github.com/gofiber/fiber v1.9.6
+	github.com/gofiber/recover v0.0.5
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect

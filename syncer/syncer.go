@@ -10,12 +10,12 @@ import (
 
 type Syncer struct {
 	// Public
-	Log          *logrus.Entry
-	GlobalConfig *config.Configuration
-	Config       *config.SyncerConfig
-	Name         string
-
+	Log                       *logrus.Entry
+	GlobalConfig              *config.Configuration
+	Config                    *config.SyncerConfig
+	Name                      string
 	RemoteServiceAccountFiles *rclone.ServiceAccountManager
+	Ws                        *WebServer
 }
 
 func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncerName string, parallelism int) (*Syncer, error) {
@@ -32,12 +32,15 @@ func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncer
 	}
 
 	// init syncer
+	l := logger.GetLogger(syncerName)
+
 	syncer := &Syncer{
-		Log:                       logger.GetLogger(syncerName),
+		Log:                       l,
 		GlobalConfig:              config,
 		Config:                    syncerConfig,
 		Name:                      syncerName,
 		RemoteServiceAccountFiles: sam,
+		Ws:                        newWebServer("127.0.0.1", 3263, l, sam),
 	}
 
 	return syncer, nil

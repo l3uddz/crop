@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/config"
@@ -121,11 +122,22 @@ func worker(wg *sync.WaitGroup, jobs <-chan *syncer.Syncer) {
 func performSync(s *syncer.Syncer) error {
 	s.Log.Info("Running...")
 
+	var gcloneParams []string
+	if strings.Contains(s.GlobalConfig.Rclone.Path, "gclone") {
+		// start web-server
+		s.Ws.Run()
+
+		gcloneParams = append(gcloneParams,
+			"--drive-service-account-url",
+			fmt.Sprintf("http://%s:%d", s.Ws.Host, s.Ws.Port),
+		)
+	}
+
 	/* Copies */
 	if len(s.Config.Remotes.Copy) > 0 {
 		s.Log.Info("Running copies...")
 
-		if err := s.Copy(nil); err != nil {
+		if err := s.Copy(gcloneParams); err != nil {
 			return errors.WithMessage(err, "failed performing all copies")
 		}
 
@@ -136,7 +148,7 @@ func performSync(s *syncer.Syncer) error {
 	if len(s.Config.Remotes.Sync) > 0 {
 		s.Log.Info("Running syncs...")
 
-		if err := s.Sync(nil); err != nil {
+		if err := s.Sync(gcloneParams); err != nil {
 			return errors.WithMessage(err, "failed performing all syncs")
 		}
 
