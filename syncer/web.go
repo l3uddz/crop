@@ -9,7 +9,21 @@ import (
 	"github.com/phayes/freeport"
 	"github.com/sirupsen/logrus"
 	"sync"
+	"time"
 )
+
+/* Structs */
+
+type ServiceAccountCache struct {
+	cache map[string]*ServiceAccountCacheEntry
+	sync.Mutex
+}
+
+type ServiceAccountCacheEntry struct {
+	ResponseServiceAccount string
+	Expires                time.Time
+	Hits                   int
+}
 
 type WebServer struct {
 	Host       string
@@ -19,6 +33,7 @@ type WebServer struct {
 	log        *logrus.Entry
 	syncerName string
 	sa         *rclone.ServiceAccountManager
+	saCache    *ServiceAccountCache
 }
 
 type FreePortCache struct {
@@ -31,9 +46,20 @@ type ServiceAccountRequest struct {
 	Remote            string `json:"remote"`
 }
 
+/* Const */
+
+const (
+	maxSaCacheHits       int           = 4
+	durationSaCacheEntry time.Duration = 1 * time.Minute
+)
+
+/* Var */
+
 var (
 	fpc *FreePortCache
 )
+
+/* Private */
 
 func init() {
 	fpc = &FreePortCache{
@@ -70,6 +96,10 @@ func newWebServer(host string, log *logrus.Entry, syncerName string, sa *rclone.
 		log:        log,
 		syncerName: syncerName,
 		sa:         sa,
+		saCache: &ServiceAccountCache{
+			cache: make(map[string]*ServiceAccountCacheEntry),
+			Mutex: sync.Mutex{},
+		},
 	}
 
 	// setup app
@@ -107,12 +137,38 @@ func (ws *WebServer) ServiceAccountHandler(c *fiber.Ctx) {
 	// only accept json
 	c.Accepts("application/json")
 
+	// acquire cache lock
+	ws.saCache.Lock()
+	defer ws.saCache.Unlock()
+
 	// parse body
 	req := new(ServiceAccountRequest)
 	if err := c.BodyParser(req); err != nil {
 		ws.log.WithError(err).Error("Failed parsing service account request from gclone...")
 		c.SendStatus(500)
 		return
+	}
+
+	// have we issued a replacement sa for this banned sa?
+	now := time.Now().UTC()
+	nsa, ok := ws.saCache.cache[req.OldServiceAccount]
+	switch {
+	case ok && nsa.Expires.After(now):
+		// we issued a replacement sa for this one already
+		nsa.Hits++
+		if nsa.Hits <= maxSaCacheHits {
+			// return last response
+			c.SendString(nsa.ResponseServiceAccount)
+			return
+		}
+
+		// remove entries that have exceeded max hits
+		delete(ws.saCache.cache, req.OldServiceAccount)
+	case ok && nsa.Expires.Before(now):
+		// we issued a replacement sa for this one already, but it has expired
+		delete(ws.saCache.cache, req.OldServiceAccount)
+	default:
+		break
 	}
 
 	// handle response
@@ -129,15 +185,22 @@ func (ws *WebServer) ServiceAccountHandler(c *fiber.Ctx) {
 	sa, err := ws.sa.GetServiceAccount(req.Remote)
 	switch {
 	case err != nil:
-		ws.log.WithError(err).Error("Failed retrieving service account for remote: %q", req.Remote)
+		ws.log.WithError(err).Errorf("Failed retrieving service account for remote: %q", req.Remote)
 		c.SendStatus(500)
 		return
 	case len(sa) < 1:
-		ws.log.Error("Failed finding service account for remote: %q", req.Remote)
+		ws.log.Errorf("Failed finding service account for remote: %q", req.Remote)
 		c.SendStatus(500)
 		return
 	default:
 		break
+	}
+
+	// store
+	ws.saCache.cache[req.OldServiceAccount] = &ServiceAccountCacheEntry{
+		ResponseServiceAccount: sa[0].ServiceAccountPath,
+		Expires:                time.Now().UTC().Add(durationSaCacheEntry),
+		Hits:                   0,
 	}
 
 	c.SendString(sa[0].ServiceAccountPath)
