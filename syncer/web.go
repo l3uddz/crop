@@ -49,7 +49,7 @@ type ServiceAccountRequest struct {
 /* Const */
 
 const (
-	maxSaCacheHits       int           = 4
+	maxSaCacheHits       int           = 6
 	durationSaCacheEntry time.Duration = 10 * time.Second
 )
 
@@ -153,7 +153,7 @@ func (ws *WebServer) ServiceAccountHandler(c *fiber.Ctx) {
 	now := time.Now().UTC()
 	nsa, ok := ws.saCache.cache[req.OldServiceAccount]
 	switch {
-	case ok && nsa.Expires.After(now):
+	case ok && now.Before(nsa.Expires):
 		// we issued a replacement sa for this one already
 		nsa.Hits++
 		if nsa.Hits <= maxSaCacheHits {
@@ -164,7 +164,7 @@ func (ws *WebServer) ServiceAccountHandler(c *fiber.Ctx) {
 
 		// remove entries that have exceeded max hits
 		delete(ws.saCache.cache, req.OldServiceAccount)
-	case ok && nsa.Expires.Before(now):
+	case ok:
 		// we issued a replacement sa for this one already, but it has expired
 		delete(ws.saCache.cache, req.OldServiceAccount)
 	default:
