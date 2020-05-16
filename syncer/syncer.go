@@ -4,6 +4,7 @@ import (
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/rclone"
+	"github.com/l3uddz/crop/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -15,7 +16,7 @@ type Syncer struct {
 	Config                    *config.SyncerConfig
 	Name                      string
 	RemoteServiceAccountFiles *rclone.ServiceAccountManager
-	Ws                        *WebServer
+	Ws                        *web.Server
 }
 
 func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncerName string, parallelism int) (*Syncer, error) {
@@ -40,7 +41,7 @@ func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncer
 		Config:                    syncerConfig,
 		Name:                      syncerName,
 		RemoteServiceAccountFiles: sam,
-		Ws:                        newWebServer("127.0.0.1", l, syncerName, sam),
+		Ws:                        web.New("127.0.0.1", l, syncerName, sam),
 	}
 
 	return syncer, nil

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/config"
@@ -116,6 +117,20 @@ func init() {
 func performUpload(u *uploader.Uploader) error {
 	u.Log.Info("Running...")
 
+	var gcloneParams []string
+
+	if strings.Contains(u.GlobalConfig.Rclone.Path, "gclone") &&
+		u.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
+		// start web-server
+		u.Ws.Run()
+		defer u.Ws.Stop()
+
+		gcloneParams = append(gcloneParams,
+			"--drive-service-account-url",
+			fmt.Sprintf("http://%s:%d", u.Ws.Host, u.Ws.Port),
+		)
+	}
+
 	/* Cleans */
 	if u.Config.Hidden.Enabled {
 		err := performClean(u)
@@ -130,6 +145,11 @@ func performUpload(u *uploader.Uploader) error {
 	if !flagNoCheck || u.Config.Check.Forced {
 		// if no-check is false (default) or check is forced via config, include check params
 		additionalRcloneParams = u.CheckRcloneParams()
+	}
+
+	// add gclone params set
+	if len(gcloneParams) > 0 {
+		additionalRcloneParams = append(additionalRcloneParams, gcloneParams...)
 	}
 
 	/* Copies */

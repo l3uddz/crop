@@ -9,6 +9,7 @@ import (
 	"github.com/l3uddz/crop/reutils"
 	"github.com/l3uddz/crop/uploader/checker"
 	"github.com/l3uddz/crop/uploader/cleaner"
+	"github.com/l3uddz/crop/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"regexp"
@@ -34,6 +35,8 @@ type Uploader struct {
 	LocalFilesSize uint64
 	HiddenFiles    []pathutils.Path
 	HiddenFolders  []pathutils.Path
+
+	Ws *web.Server
 }
 
 func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, uploaderName string) (*Uploader, error) {
@@ -100,8 +103,9 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 	}
 
 	// init uploader
+	l := logger.GetLogger(uploaderName)
 	uploader := &Uploader{
-		Log:                       logger.GetLogger(uploaderName),
+		Log:                       l,
 		GlobalConfig:              config,
 		Config:                    uploaderConfig,
 		Name:                      uploaderName,
@@ -110,6 +114,7 @@ func New(config *config.Configuration, uploaderConfig *config.UploaderConfig, up
 		IncludePatterns:           includePatterns,
 		ExcludePatterns:           excludePatterns,
 		RemoteServiceAccountFiles: sam,
+		Ws:                        web.New("127.0.0.1", l, uploaderName, sam),
 	}
 
 	return uploader, nil

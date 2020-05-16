@@ -123,7 +123,8 @@ func performSync(s *syncer.Syncer) error {
 	s.Log.Info("Running...")
 
 	var gcloneParams []string
-	if strings.Contains(s.GlobalConfig.Rclone.Path, "gclone") {
+	if strings.Contains(s.GlobalConfig.Rclone.Path, "gclone") &&
+		s.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
 		// start web-server
 		s.Ws.Run()
 		defer s.Ws.Stop()
