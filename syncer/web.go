@@ -50,7 +50,7 @@ type ServiceAccountRequest struct {
 
 const (
 	maxSaCacheHits       int           = 4
-	durationSaCacheEntry time.Duration = 1 * time.Minute
+	durationSaCacheEntry time.Duration = 10 * time.Second
 )
 
 /* Var */
@@ -116,7 +116,7 @@ func newWebServer(host string, log *logrus.Entry, syncerName string, sa *rclone.
 
 func (ws *WebServer) Run() {
 	go func() {
-		ws.log.Infof("Starting service account server on %s:%d", ws.Host, ws.Port)
+		ws.log.Infof("Starting service account server: %s:%d", ws.Host, ws.Port)
 		ws.Running = true
 
 		if err := ws.app.Listen(fmt.Sprintf("%s:%d", ws.Host, ws.Port)); err != nil {
@@ -196,12 +196,19 @@ func (ws *WebServer) ServiceAccountHandler(c *fiber.Ctx) {
 		break
 	}
 
-	// store
-	ws.saCache.cache[req.OldServiceAccount] = &ServiceAccountCacheEntry{
+	// create cache entry
+	cacheEntry := &ServiceAccountCacheEntry{
 		ResponseServiceAccount: sa[0].ServiceAccountPath,
 		Expires:                time.Now().UTC().Add(durationSaCacheEntry),
 		Hits:                   0,
 	}
+
+	// store cache entry for the old account
+	ws.saCache.cache[req.OldServiceAccount] = cacheEntry
+
+	// store cache entry for the new account
+	// (so if another gclone transfer routine requests within N duration, re-issue the same sa)
+	ws.saCache.cache[sa[0].ServiceAccountPath] = cacheEntry
 
 	c.SendString(sa[0].ServiceAccountPath)
 }
