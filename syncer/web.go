@@ -6,16 +6,23 @@ import (
 	"github.com/gofiber/recover"
 	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/rclone"
+	"github.com/phayes/freeport"
 	"github.com/sirupsen/logrus"
+	"sync"
 )
 
 type WebServer struct {
-	Host string
-	Port int
+	Host       string
+	Port       int
+	app        *fiber.App
+	log        *logrus.Entry
+	syncerName string
+	sa         *rclone.ServiceAccountManager
+}
 
-	app *fiber.App
-	log *logrus.Entry
-	sa  *rclone.ServiceAccountManager
+type FreePortCache struct {
+	pCache map[int]int
+	sync.Mutex
 }
 
 type ServiceAccountRequest struct {
@@ -23,13 +30,45 @@ type ServiceAccountRequest struct {
 	Remote            string `json:"remote"`
 }
 
-func newWebServer(host string, port int, log *logrus.Entry, sa *rclone.ServiceAccountManager) *WebServer {
+var (
+	fpc *FreePortCache
+)
+
+func init() {
+	fpc = &FreePortCache{
+		pCache: make(map[int]int),
+		Mutex:  sync.Mutex{},
+	}
+}
+
+func newWebServer(host string, log *logrus.Entry, syncerName string, sa *rclone.ServiceAccountManager) *WebServer {
+	// get free port
+	fpc.Lock()
+	defer fpc.Unlock()
+	port := 0
+
+	for {
+		p, err := freeport.GetFreePort()
+		if err != nil {
+			log.WithError(err).Fatal("Failed locating free port for the service account server")
+		}
+
+		if _, exists := fpc.pCache[p]; !exists {
+			fpc.pCache[p] = p
+			port = p
+			log.Debugf("Found free port for service account server: %d", port)
+			break
+		}
+	}
+
+	// create ws object
 	ws := &WebServer{
-		Host: host,
-		Port: port,
-		app:  fiber.New(),
-		log:  log,
-		sa:   sa,
+		Host:       host,
+		Port:       port,
+		app:        fiber.New(),
+		log:        log,
+		syncerName: syncerName,
+		sa:         sa,
 	}
 
 	// setup app

@@ -40,7 +40,7 @@ func New(config *config.Configuration, syncerConfig *config.SyncerConfig, syncer
 		Config:                    syncerConfig,
 		Name:                      syncerName,
 		RemoteServiceAccountFiles: sam,
-		Ws:                        newWebServer("127.0.0.1", 3263, l, sam),
+		Ws:                        newWebServer("127.0.0.1", l, syncerName, sam),
 	}
 
 	return syncer, nil

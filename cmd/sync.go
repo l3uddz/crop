@@ -126,6 +126,7 @@ func performSync(s *syncer.Syncer) error {
 	if strings.Contains(s.GlobalConfig.Rclone.Path, "gclone") {
 		// start web-server
 		s.Ws.Run()
+		defer s.Ws.Stop()
 
 		gcloneParams = append(gcloneParams,
 			"--drive-service-account-url",
