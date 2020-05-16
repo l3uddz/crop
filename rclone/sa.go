@@ -126,7 +126,7 @@ func (m *ServiceAccountManager) LoadServiceAccounts(remotePaths []string) error 
 
 		// add to remote service accounts var
 		v := RemoteServiceAccounts{
-			RemoteEnvVar:    fmt.Sprintf("RCLONE_CONFIG_%s_SERVICE_ACCOUNT_FILE", strings.ToUpper(remoteName)),
+			RemoteEnvVar:    ConfigToEnv(remoteName, "SERVICE_ACCOUNT_FILE"),
 			ServiceAccounts: serviceAccountFiles,
 		}
 		m.remoteServiceAccounts[remoteName] = v
