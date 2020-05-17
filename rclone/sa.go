@@ -2,6 +2,7 @@ package rclone
 
 import (
 	"fmt"
+	"github.com/ReneKroon/ttlcache"
 	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/maputils"
@@ -37,19 +38,25 @@ type ServiceAccountManager struct {
 }
 
 var (
-	mtx  sync.Mutex
-	psac map[string]time.Time
+	mtx    sync.Mutex
+	mcache *ttlcache.Cache
 )
 
 /* Private */
 
 func init() {
-	psac = make(map[string]time.Time)
+	mcache = ttlcache.NewCache()
+	mcache.SetTTL(30 * time.Minute)
+	mcache.SetExpirationCallback(mcacheItemExpired)
+}
+
+func mcacheItemExpired(key string, _ interface{}) {
+	log.Debugf("Cleared SA from mcache: %s", key)
 }
 
 func addServiceAccountsToTempCache(serviceAccounts []*RemoteServiceAccount, duration time.Duration) {
 	for _, sa := range serviceAccounts {
-		psac[sa.ServiceAccountPath] = time.Now().UTC().Add(duration)
+		mcache.Set(sa.ServiceAccountPath, nil)
 	}
 }
 
@@ -180,16 +187,10 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 			}
 
 			// has this service account been issued within N seconds?
-			expiry, exists := psac[sa.RealPath]
-			switch {
-			case exists && expiry.Before(time.Now().UTC()):
-				// it was issued before, but it was not within N seconds
-				delete(psac, sa.RealPath)
-			case exists:
-				// it was issued before and it has not expired yet
+			_, exists := mcache.Get(sa.RealPath)
+			if exists {
+				// this sa was in our memory cache and has not expired yet
 				continue
-			default:
-				break
 			}
 
 			// this service account is unbanned
@@ -239,7 +240,7 @@ func RemoveServiceAccountsFromTempCache(serviceAccounts []*RemoteServiceAccount)
 	defer mtx.Unlock()
 
 	for _, sa := range serviceAccounts {
-		delete(psac, sa.ServiceAccountPath)
+		mcache.Remove(sa.ServiceAccountPath)
 	}
 }
 

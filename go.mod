@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/DataDog/zstd v1.4.5 // indirect
+	github.com/ReneKroon/ttlcache v1.6.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/dgraph-io/badger/v2 v2.0.3 // indirect
 	github.com/dustin/go-humanize v1.0.0
