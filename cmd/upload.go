@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strings"
+	"time"
 )
 
 var (
@@ -28,6 +29,8 @@ var uploadCmd = &cobra.Command{
 		defer cache.Close()
 
 		// iterate uploader's
+		started := time.Now().UTC()
+
 		for _, uploaderConfig := range config.Config.Uploader {
 			log := log.WithField("uploader", uploaderConfig.Name)
 
@@ -103,6 +106,8 @@ var uploadCmd = &cobra.Command{
 				continue
 			}
 		}
+
+		log.Infof("Finished in: %v", humanize.RelTime(started, time.Now().UTC(), "", ""))
 	},
 }
 

@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
@@ -40,6 +41,8 @@ var syncCmd = &cobra.Command{
 		}
 
 		// iterate syncer's
+		started := time.Now().UTC()
+
 		for _, syncerConfig := range config.Config.Syncer {
 			syncerConfig := syncerConfig
 
@@ -99,6 +102,8 @@ var syncCmd = &cobra.Command{
 		log.Info("Waiting for syncer(s) to finish")
 		close(jobs)
 		wg.Wait()
+
+		log.Infof("Finished in: %v", humanize.RelTime(started, time.Now().UTC(), "", ""))
 	},
 }
 

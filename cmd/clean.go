@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"github.com/dustin/go-humanize"
 	"github.com/l3uddz/crop/config"
 	"github.com/l3uddz/crop/uploader"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/yale8848/gorpool"
 	"strings"
+	"time"
 )
 
 var cleanCmd = &cobra.Command{
@@ -19,6 +21,8 @@ var cleanCmd = &cobra.Command{
 		initCore(true)
 
 		// iterate uploader's
+		started := time.Now().UTC()
+
 		for _, uploaderConfig := range config.Config.Uploader {
 			log := log.WithField("uploader", uploaderConfig.Name)
 
@@ -49,6 +53,8 @@ var cleanCmd = &cobra.Command{
 				continue
 			}
 		}
+
+		log.Infof("Finished in: %v", humanize.RelTime(started, time.Now().UTC(), "", ""))
 	},
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strings"
+	"time"
 )
 
 var (
@@ -109,6 +110,7 @@ var manualCmd = &cobra.Command{
 		}
 
 		// create syncer
+		started := time.Now().UTC()
 		sync, err := syncer.New(&cfg, &syncerConfig, syncerConfig.Name, 1)
 		if err != nil {
 			log.WithError(err).Fatal("Failed initializing syncer, skipping...")
@@ -147,7 +149,7 @@ var manualCmd = &cobra.Command{
 			sync.Log.WithError(err).Fatal("Error occurred while running syncer, skipping...")
 		}
 
-		log.Info("Finished!")
+		log.Infof("Finished in: %v", humanize.RelTime(started, time.Now().UTC(), "", ""))
 	},
 }
 
