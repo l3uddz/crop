@@ -83,5 +83,6 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 	// (so if another gclone transfer routine requests within N duration, re-issue the same sa)
 	ws.saCache.cache[sa[0].ServiceAccountPath] = cacheEntry
 
+	// return service account
 	c.SendString(sa[0].ServiceAccountPath)
 }

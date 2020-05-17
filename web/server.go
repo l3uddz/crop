@@ -14,7 +14,7 @@ import (
 /* Const */
 
 const (
-	maxSaCacheHits       int           = 6
+	maxSaCacheHits       int           = 4
 	durationSaCacheEntry time.Duration = 10 * time.Second
 )
 

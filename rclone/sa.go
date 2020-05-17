@@ -54,7 +54,7 @@ func mcacheItemExpired(key string, _ interface{}) {
 	log.Debugf("Cleared SA from mcache: %s", key)
 }
 
-func addServiceAccountsToTempCache(serviceAccounts []*RemoteServiceAccount, duration time.Duration) {
+func addServiceAccountsToTempCache(serviceAccounts []*RemoteServiceAccount) {
 	for _, sa := range serviceAccounts {
 		mcache.Set(sa.ServiceAccountPath, nil)
 	}
@@ -218,8 +218,8 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 	// were service accounts found?
 	if err == nil && m.parallelism > 1 && len(serviceAccounts) > 0 {
 		// there may be multiple routines requesting service accounts
-		// prevent service account from being re-used (unless explicitly removed by a successful operation)
-		addServiceAccountsToTempCache(serviceAccounts, 24*time.Hour)
+		// attempt to prevent service account from being re-used (unless explicitly removed by a successful operation)
+		addServiceAccountsToTempCache(serviceAccounts)
 	}
 
 	return serviceAccounts, err
