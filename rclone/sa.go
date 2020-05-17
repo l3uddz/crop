@@ -46,7 +46,7 @@ var (
 
 func init() {
 	mcache = ttlcache.NewCache()
-	mcache.SetTTL(30 * time.Minute)
+	mcache.SetTTL(60 * time.Minute)
 	mcache.SetExpirationCallback(mcacheItemExpired)
 }
 
