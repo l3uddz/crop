@@ -12,5 +12,5 @@ var (
 func GetEveryNumber(from string) string {
 	matches := num.FindAllString(from, -1)
 	val := strings.Join(matches, "")
-	return val
+	return strings.TrimLeft(val, "0")
 }
