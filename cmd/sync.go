@@ -17,6 +17,7 @@ import (
 var (
 	flagSyncer      string
 	flagParallelism int
+	flagNoDedupe    bool
 )
 
 var syncCmd = &cobra.Command{
@@ -106,6 +107,8 @@ func init() {
 
 	syncCmd.Flags().StringVarP(&flagSyncer, "syncer", "s", "", "Run for a specific syncer")
 	syncCmd.Flags().IntVarP(&flagParallelism, "parallelism", "p", 1, "Max parallel syncers")
+
+	syncCmd.Flags().BoolVar(&flagNoDedupe, "no-dedupe", false, "Ignore dedupe tasks for syncer")
 }
 
 func worker(wg *sync.WaitGroup, jobs <-chan *syncer.Syncer) {
@@ -169,7 +172,7 @@ func performSync(s *syncer.Syncer) error {
 	}
 
 	/* Dedupe */
-	if len(s.Config.Remotes.Dedupe) > 0 {
+	if !flagNoDedupe && len(s.Config.Remotes.Dedupe) > 0 {
 		s.Log.Info("Running dedupes...")
 
 		if err := s.Dedupe(nil); err != nil {
