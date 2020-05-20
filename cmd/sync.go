@@ -130,14 +130,13 @@ func worker(wg *sync.WaitGroup, jobs <-chan *syncer.Syncer) {
 func performSync(s *syncer.Syncer) error {
 	s.Log.Info("Running...")
 
-	var gcloneParams []string
-	if strings.Contains(s.GlobalConfig.Rclone.Path, "gclone") &&
-		s.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
+	var liveRotateParams []string
+	if s.GlobalConfig.Rclone.LiveRotate && s.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
 		// start web-server
 		s.Ws.Run()
 		defer s.Ws.Stop()
 
-		gcloneParams = append(gcloneParams,
+		liveRotateParams = append(liveRotateParams,
 			"--drive-service-account-url",
 			fmt.Sprintf("http://%s:%d", s.Ws.Host, s.Ws.Port),
 		)
@@ -147,7 +146,7 @@ func performSync(s *syncer.Syncer) error {
 	if len(s.Config.Remotes.Copy) > 0 {
 		s.Log.Info("Running copies...")
 
-		if err := s.Copy(gcloneParams); err != nil {
+		if err := s.Copy(liveRotateParams); err != nil {
 			return errors.WithMessage(err, "failed performing all copies")
 		}
 
@@ -158,7 +157,7 @@ func performSync(s *syncer.Syncer) error {
 	if len(s.Config.Remotes.Sync) > 0 {
 		s.Log.Info("Running syncs...")
 
-		if err := s.Sync(gcloneParams); err != nil {
+		if err := s.Sync(liveRotateParams); err != nil {
 			return errors.WithMessage(err, "failed performing all syncs")
 		}
 

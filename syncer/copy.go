@@ -63,7 +63,7 @@ func (s *Syncer) Copy(additionalRcloneParams []string) error {
 			} else if success {
 				// successful exit code
 				if !s.Ws.Running {
-					// web service is not running (no gclone)
+					// web service is not running (no live rotate)
 					rclone.RemoveServiceAccountsFromTempCache(serviceAccounts)
 				}
 				break

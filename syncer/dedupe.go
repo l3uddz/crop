@@ -24,6 +24,14 @@ func (s *Syncer) Dedupe(additionalRcloneParams []string) error {
 			"dedupe_remote": dedupeRemote,
 		})
 
+		// service account
+		if s.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
+			sa, err := s.RemoteServiceAccountFiles.GetRandomServiceAccount(dedupeRemote)
+			if err == nil && sa != "" {
+				extraParams = append(extraParams, "--drive-service-account-file", sa)
+			}
+		}
+
 		// dedupe remote
 		rLog.Info("Deduping...")
 		success, exitCode, err := rclone.Dedupe(dedupeRemote, extraParams)

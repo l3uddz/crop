@@ -17,7 +17,7 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 	// parse body
 	req := new(ServiceAccountRequest)
 	if err := c.BodyParser(req); err != nil {
-		ws.log.WithError(err).Error("Failed parsing service account request from gclone...")
+		ws.log.WithError(err).Error("Failed parsing service account request from rclone...")
 		c.SendStatus(500)
 		return
 	}
@@ -80,9 +80,10 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 	ws.saCache.cache[req.OldServiceAccount] = cacheEntry
 
 	// store cache entry for the new account
-	// (so if another gclone transfer routine requests within N duration, re-issue the same sa)
+	// (so if another transfer routine requests within N duration, re-issue the same sa)
 	ws.saCache.cache[sa[0].ServiceAccountPath] = cacheEntry
 
 	// return service account
+	ws.log.Warnf("New service account for remote %q, sa: %v", req.Remote, sa[0].ServiceAccountPath)
 	c.SendString(sa[0].ServiceAccountPath)
 }

@@ -123,6 +123,7 @@ func setConfigDefaults(check bool) error {
 	// rclone settings
 	added += setConfigDefault("rclone.path", "/usr/bin/rclone", check)
 	added += setConfigDefault("rclone.config", "/Users/l3uddz/.config/rclone/rclone.conf", check)
+	added += setConfigDefault("rclone.live_rotate", false, check)
 
 	// were new settings added?
 	if check && added > 0 {

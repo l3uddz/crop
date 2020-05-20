@@ -11,6 +11,7 @@ import (
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/sirupsen/logrus"
 	"go/types"
+	"math/rand"
 	"sort"
 	"strconv"
 	"strings"
@@ -143,6 +144,30 @@ func (m *ServiceAccountManager) LoadServiceAccounts(remotePaths []string) error 
 	}
 
 	return nil
+}
+
+func (m *ServiceAccountManager) GetRandomServiceAccount(remotePath string) (string, error) {
+	// parse remote name
+	remoteName := stringutils.FromLeftUntil(remotePath, ":")
+	if remoteName == "" {
+		// no remote name was parsed, so ignore this request
+		m.log.Tracef("No remote determined for: %q, not providing service account", remotePath)
+		return "", nil
+	}
+
+	// service accounts loaded for this remote?
+	remote, ok := m.remoteServiceAccounts[remoteName]
+	if !ok || len(remote.ServiceAccounts) == 0 {
+		// no service accounts found for this remote
+		m.log.Tracef("No service accounts loaded for remote: %q, not providing service account", remoteName)
+		return "", nil
+	}
+
+	// random service account
+	rand.Seed(time.Now().Unix())
+	sa := remote.ServiceAccounts[rand.Intn(len(remote.ServiceAccounts))]
+
+	return sa.RealPath, nil
 }
 
 func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*RemoteServiceAccount, error) {

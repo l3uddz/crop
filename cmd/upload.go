@@ -122,15 +122,14 @@ func init() {
 func performUpload(u *uploader.Uploader) error {
 	u.Log.Info("Running...")
 
-	var gcloneParams []string
+	var liveRotateParams []string
 
-	if strings.Contains(u.GlobalConfig.Rclone.Path, "gclone") &&
-		u.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
+	if u.GlobalConfig.Rclone.LiveRotate && u.RemoteServiceAccountFiles.ServiceAccountsCount() > 0 {
 		// start web-server
 		u.Ws.Run()
 		defer u.Ws.Stop()
 
-		gcloneParams = append(gcloneParams,
+		liveRotateParams = append(liveRotateParams,
 			"--drive-service-account-url",
 			fmt.Sprintf("http://%s:%d", u.Ws.Host, u.Ws.Port),
 		)
@@ -152,9 +151,9 @@ func performUpload(u *uploader.Uploader) error {
 		additionalRcloneParams = u.CheckRcloneParams()
 	}
 
-	// add gclone params set
-	if len(gcloneParams) > 0 {
-		additionalRcloneParams = append(additionalRcloneParams, gcloneParams...)
+	// add live rotate params set
+	if len(liveRotateParams) > 0 {
+		additionalRcloneParams = append(additionalRcloneParams, liveRotateParams...)
 	}
 
 	/* Copies */
