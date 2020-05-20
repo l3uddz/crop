@@ -16,6 +16,7 @@ rclone:
   config: /home/seed/.config/rclone/rclone.conf
   path: /usr/bin/rclone
   stats: 30s
+  live_rotate: false
   service_account_remotes:
     tv: /opt/rclone/service_accounts/crop
     movies: /opt/rclone/service_accounts/crop
@@ -127,6 +128,8 @@ syncer:
 
 `crop sync`
 
+`crop sync -p 2`
+
 - Manual - Perform manual sync/copy job(s)
 
 `crop manual --copy --src remote1:/Backups --dst remote2:/Backups --sa /opt/service_accounts -- --dry-run --drive-use-trash=false`
@@ -137,7 +140,10 @@ syncer:
 
 ## Notes
 
-Make use of `--dry-run` and `-vv` to ensure your configuration is correct and yielding expected results.
+- Make use of `--dry-run` and `-vv` to ensure your configuration is correct and yielding expected results.
+
+- `live_rotate` will enable on-demand live-rotation of service accounts for a customized build of rclone / gclone.
+
 
 ## Credits
 
