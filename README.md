@@ -40,6 +40,7 @@ rclone:
         - '--drive-chunk-size=128M'
         - '--drive-use-trash=false'
       dedupe:
+        - '--dedupe-mode=newest'
         - '--tpslimit=5'
 uploader:
   - name: cloudbox_unionfs
