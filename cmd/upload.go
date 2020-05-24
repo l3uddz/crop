@@ -88,6 +88,11 @@ var uploadCmd = &cobra.Command{
 				continue
 			}
 
+			if len(upload.LocalFiles) == 0 {
+				// there are no files to upload
+				continue
+			}
+
 			// check if upload criteria met
 			if !flagNoCheck {
 				// no check was not enabled
