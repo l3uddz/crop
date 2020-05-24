@@ -9,10 +9,12 @@ import (
 	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/runtime"
 	"github.com/l3uddz/crop/stringutils"
+	"github.com/nightlyone/lockfile"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var (
@@ -22,14 +24,15 @@ var (
 	flagConfigFile   = "config.yaml"
 	flagCachePath    = "cache"
 	flagLogFile      = "activity.log"
-
-	flagDryRun bool
+	flagLockFile     = "crop.lock"
+	flagDryRun       bool
 
 	// Global command specific
 	flagUploader string
 
 	// Global vars
-	log *logrus.Entry
+	log   *logrus.Entry
+	flock lockfile.Lockfile
 )
 
 var rootCmd = &cobra.Command{
@@ -69,12 +72,19 @@ func initCore(showAppInfo bool) {
 		flagLogFile = filepath.Join(flagConfigFolder, flagLogFile)
 	}
 
+	flagLockFile = filepath.Join(flagConfigFolder, flagLockFile)
+
 	// Init Logging
 	if err := logger.Init(flagLogLevel, flagLogFile); err != nil {
 		log.WithError(err).Fatal("Failed to initialize logging")
 	}
 
 	log = logger.GetLogger("crop")
+
+	// Init File Lock
+	if err := acquireFileLock(); err != nil {
+		log.WithError(err).Fatalf("Failed acquiring file lock for %q", flagLockFile)
+	}
 
 	// Init Config
 	if err := config.Init(flagConfigFile); err != nil {
@@ -103,6 +113,38 @@ func setConfigOverrides() {
 	// set dry-run if enabled by flag
 	if flagDryRun {
 		config.Config.Rclone.DryRun = true
+	}
+}
+
+func acquireFileLock() error {
+	f, err := lockfile.New(flagLockFile)
+	if err != nil {
+		return err
+	}
+
+	flock = f
+
+	// loop until lock has been acquired
+	for {
+		err = flock.TryLock()
+		switch {
+		case err == nil:
+			// lock has been acquired
+			return nil
+		case err == lockfile.ErrBusy:
+			// another instance is already running
+			log.Warnf("There is another crop instance running, re-checking in 1 minute...")
+			time.Sleep(1 * time.Minute)
+		default:
+			// an un-expected error, propagate down-stream
+			return err
+		}
+	}
+}
+
+func releaseFileLock() {
+	if err := flock.Unlock(); err != nil {
+		log.WithError(err).Fatalf("Failed releasing file lock for %q", flagLockFile)
 	}
 }
 

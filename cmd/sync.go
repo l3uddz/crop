@@ -30,6 +30,7 @@ var syncCmd = &cobra.Command{
 		// init core
 		initCore(true)
 		defer cache.Close()
+		defer releaseFileLock()
 
 		// create workers
 		var wg sync.WaitGroup

@@ -19,6 +19,7 @@ var updateCmd = &cobra.Command{
 		// init core
 		initCore(false)
 		defer cache.Close()
+		defer releaseFileLock()
 
 		// parse current version
 		v, err := semver.Parse(runtime.Version)

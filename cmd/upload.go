@@ -27,6 +27,7 @@ var uploadCmd = &cobra.Command{
 		// init core
 		initCore(true)
 		defer cache.Close()
+		defer releaseFileLock()
 
 		// iterate uploader's
 		started := time.Now().UTC()

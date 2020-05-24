@@ -19,6 +19,7 @@ var cleanCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// init core
 		initCore(true)
+		defer releaseFileLock()
 
 		// iterate uploader's
 		started := time.Now().UTC()

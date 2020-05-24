@@ -30,6 +30,7 @@ var manualCmd = &cobra.Command{
 		// init core
 		initCore(true)
 		defer cache.Close()
+		defer releaseFileLock()
 
 		// determine destination remotes
 		syncRemotes := make([]string, 0)
