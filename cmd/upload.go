@@ -91,6 +91,7 @@ var uploadCmd = &cobra.Command{
 
 			if len(upload.LocalFiles) == 0 {
 				// there are no files to upload
+				upload.Log.Info("There were no files found, skipping...")
 				continue
 			}
 
