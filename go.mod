@@ -10,8 +10,8 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.0
-	github.com/gofiber/fiber v1.9.6
-	github.com/gofiber/recover v0.0.5
+	github.com/gofiber/fiber v1.10.1
+	github.com/gofiber/recover v0.1.0
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/klauspost/compress v1.10.6 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
@@ -38,10 +38,11 @@ require (
 	github.com/yale8848/gorpool v0.1.0
 	github.com/zippoxer/bow v0.0.0-20200229231453-bf1012ae7ab9
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
-	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2 // indirect
+	golang.org/x/net v0.0.0-20200528225125-3c3fba18258b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
-	gopkg.in/ini.v1 v1.56.0 // indirect
+	google.golang.org/protobuf v1.24.0 // indirect
+	gopkg.in/ini.v1 v1.57.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )
