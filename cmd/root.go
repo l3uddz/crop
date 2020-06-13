@@ -20,7 +20,7 @@ import (
 var (
 	// Global flags
 	flagLogLevel     = 0
-	flagConfigFolder = pathutils.GetCurrentBinaryPath()
+	flagConfigFolder = pathutils.GetDefaultConfigPath()
 	flagConfigFile   = "config.yaml"
 	flagCachePath    = "cache"
 	flagLogFile      = "activity.log"
@@ -55,6 +55,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&flagConfigFile, "config", "c", flagConfigFile, "Config file")
 	rootCmd.PersistentFlags().StringVarP(&flagCachePath, "cache", "d", flagCachePath, "Cache path")
 	rootCmd.PersistentFlags().StringVarP(&flagLogFile, "log", "l", flagLogFile, "Log file")
+	rootCmd.PersistentFlags().StringVarP(&flagLockFile, "lock", "f", flagLockFile, "Lock file")
 	rootCmd.PersistentFlags().CountVarP(&flagLogLevel, "verbose", "v", "Verbose level")
 
 	rootCmd.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "Dry run mode")
@@ -71,8 +72,9 @@ func initCore(showAppInfo bool) {
 	if !rootCmd.PersistentFlags().Changed("log") {
 		flagLogFile = filepath.Join(flagConfigFolder, flagLogFile)
 	}
-
-	flagLockFile = filepath.Join(flagConfigFolder, flagLockFile)
+	if !rootCmd.PersistentFlags().Changed("lock") {
+		flagLockFile = filepath.Join(flagConfigFolder, flagLockFile)
+	}
 
 	// Init Logging
 	if err := logger.Init(flagLogLevel, flagLogFile); err != nil {
