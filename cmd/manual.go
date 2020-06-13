@@ -48,7 +48,7 @@ var manualCmd = &cobra.Command{
 		}
 
 		// create remote to service account map
-		remoteSaFolders := make(map[string]string)
+		remoteSaFolders := make(map[string][]string)
 
 		switch flagSaFolder != "" {
 		case true:
@@ -56,14 +56,19 @@ var manualCmd = &cobra.Command{
 				// source is a remote
 				srcRemote := stringutils.FromLeftUntil(flagSrc, ":")
 				log.Debugf("Using service account folder for %q: %v", srcRemote, flagSaFolder)
-				remoteSaFolders[srcRemote] = flagSaFolder
+				remoteSaFolders[flagSaFolder] = []string{srcRemote}
 			}
 
 			if strings.Contains(flagDest, ":") {
 				// dest is a remote
 				dstRemote := stringutils.FromLeftUntil(flagDest, ":")
 				log.Debugf("Using service account folder for %q: %v", dstRemote, flagSaFolder)
-				remoteSaFolders[dstRemote] = flagSaFolder
+
+				if _, ok := remoteSaFolders[flagSaFolder]; ok {
+					remoteSaFolders[flagSaFolder] = append(remoteSaFolders[flagSaFolder], dstRemote)
+				} else {
+					remoteSaFolders[flagSaFolder] = []string{dstRemote}
+				}
 			}
 
 		default:

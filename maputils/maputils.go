@@ -27,3 +27,21 @@ func GetStringMapValue(stringMap map[string]string, key string, caseSensitive bo
 
 	return "", fmt.Errorf("key was not found in map: %q", lowerKey)
 }
+
+func GetStringKeysBySliceValue(stringMap map[string][]string, value string) ([]string, error) {
+	keys := make([]string, 0)
+
+	for k, v := range stringMap {
+		for _, r := range v {
+			if strings.EqualFold(r, value) {
+				keys = append(keys, k)
+			}
+		}
+	}
+
+	if len(keys) == 0 {
+		return keys, fmt.Errorf("value was not found in map: %q", value)
+	}
+
+	return keys, nil
+}

@@ -33,7 +33,7 @@ type RemoteServiceAccount struct {
 
 type ServiceAccountManager struct {
 	log                         *logrus.Entry
-	remoteServiceAccountFolders map[string]string
+	remoteServiceAccountFolders map[string][]string
 	remoteServiceAccounts       map[string]RemoteServiceAccounts
 	parallelism                 int
 }
@@ -63,7 +63,7 @@ func addServiceAccountsToTempCache(serviceAccounts []*RemoteServiceAccount) {
 
 /* Public */
 
-func NewServiceAccountManager(serviceAccountFolders map[string]string, parallelism int) *ServiceAccountManager {
+func NewServiceAccountManager(serviceAccountFolders map[string][]string, parallelism int) *ServiceAccountManager {
 	return &ServiceAccountManager{
 		log:                         logger.GetLogger("sa_manager"),
 		remoteServiceAccountFolders: serviceAccountFolders,
@@ -82,12 +82,11 @@ func (m *ServiceAccountManager) LoadServiceAccounts(remotePaths []string) error 
 			continue
 		}
 
-		// parse remote name and retrieve folder
+		// parse remote name and retrieve service account folder(s)
 		remoteName := stringutils.FromLeftUntil(remotePath, ":")
-		remoteServiceAccountFolder, err := maputils.GetStringMapValue(m.remoteServiceAccountFolders, remoteName,
-			false)
+		remoteServiceAccountFolders, err := maputils.GetStringKeysBySliceValue(m.remoteServiceAccountFolders, remoteName)
 		if err != nil {
-			m.log.Tracef("Service account folder was not found for: %q, skipping...", remoteName)
+			m.log.Tracef("Service account folder(s) not found for: %q, skipping...", remoteName)
 			continue
 		}
 
@@ -96,51 +95,64 @@ func (m *ServiceAccountManager) LoadServiceAccounts(remotePaths []string) error 
 			continue
 		}
 
-		// retrieve service files
-		serviceAccountFiles, _ := pathutils.GetPathsInFolder(remoteServiceAccountFolder, true,
-			false, func(path string) *string {
-				lowerPath := strings.ToLower(path)
+		// load service account files in all folders
+		totalServiceAccountFiles := make([]pathutils.Path, 0)
 
-				// ignore non json files
-				if !strings.HasSuffix(lowerPath, ".json") {
-					return nil
+		for _, remoteServiceAccountFolder := range remoteServiceAccountFolders {
+			// retrieve service files within this folder
+			serviceAccountFiles, _ := pathutils.GetPathsInFolder(remoteServiceAccountFolder, true,
+				false, func(path string) *string {
+					lowerPath := strings.ToLower(path)
+
+					// ignore non json files
+					if !strings.HasSuffix(lowerPath, ".json") {
+						return nil
+					}
+
+					return &path
+				})
+
+			// were service accounts found?
+			if len(serviceAccountFiles) == 0 {
+				m.log.Tracef("No service accounts found for %q in: %v", remoteName, remoteServiceAccountFolder)
+				continue
+			}
+
+			// sort service files
+			sort.SliceStable(serviceAccountFiles, func(i, j int) bool {
+				is := reutils.GetEveryNumber(serviceAccountFiles[i].RealPath)
+				js := reutils.GetEveryNumber(serviceAccountFiles[j].RealPath)
+
+				in, err := strconv.Atoi(is)
+				if err != nil {
+					return false
+				}
+				jn, err := strconv.Atoi(js)
+				if err != nil {
+					return false
 				}
 
-				return &path
+				return in < jn
 			})
 
-		// were service accounts found?
-		if len(serviceAccountFiles) == 0 {
-			m.log.Tracef("No service accounts found for %q in: %v", remoteName, remoteServiceAccountFolder)
-			continue
+			totalServiceAccountFiles = append(totalServiceAccountFiles, serviceAccountFiles...)
 		}
 
-		// sort service files
-		sort.SliceStable(serviceAccountFiles, func(i, j int) bool {
-			is := reutils.GetEveryNumber(serviceAccountFiles[i].RealPath)
-			js := reutils.GetEveryNumber(serviceAccountFiles[j].RealPath)
-
-			in, err := strconv.Atoi(is)
-			if err != nil {
-				return false
-			}
-			jn, err := strconv.Atoi(js)
-			if err != nil {
-				return false
-			}
-
-			return in < jn
-		})
+		// were service accounts found?
+		if len(totalServiceAccountFiles) == 0 {
+			m.log.Tracef("No service accounts found for %q in: %v", remoteName, remoteServiceAccountFolders)
+			continue
+		}
 
 		// add to remote service accounts var
 		v := RemoteServiceAccounts{
 			RemoteEnvVar:    ConfigToEnv(remoteName, "SERVICE_ACCOUNT_FILE"),
-			ServiceAccounts: serviceAccountFiles,
+			ServiceAccounts: totalServiceAccountFiles,
 		}
 		m.remoteServiceAccounts[remoteName] = v
 
-		m.log.Debugf("Loaded %d service accounts for remote %q (env: %v)", len(serviceAccountFiles), remoteName,
-			v.RemoteEnvVar)
+		m.log.Debugf("Loaded %d service accounts for remote %q (env: %v)", len(totalServiceAccountFiles),
+			remoteName, v.RemoteEnvVar)
 	}
 
 	return nil
@@ -252,9 +264,15 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 
 func (m *ServiceAccountManager) ServiceAccountsCount() int {
 	n := 0
+	t := make(map[string]int)
 
 	for _, remote := range m.remoteServiceAccounts {
-		n += len(remote.ServiceAccounts)
+		for _, sa := range remote.ServiceAccounts {
+			if _, ok := t[sa.RealPath]; !ok {
+				t[sa.RealPath] = 0
+				n++
+			}
+		}
 	}
 
 	return n

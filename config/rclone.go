@@ -6,7 +6,7 @@ type RcloneConfig struct {
 	Stats                 string
 	LiveRotate            bool                    `mapstructure:"live_rotate"`
 	DryRun                bool                    `mapstructure:"dry_run"`
-	ServiceAccountRemotes map[string]string       `mapstructure:"service_account_remotes"`
+	ServiceAccountRemotes map[string][]string     `mapstructure:"service_account_remotes"`
 	GlobalParams          map[string]RcloneParams `mapstructure:"global_params"`
 }
 

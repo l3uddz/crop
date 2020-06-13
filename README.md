@@ -18,12 +18,13 @@ rclone:
   stats: 30s
   live_rotate: false
   service_account_remotes:
-    tv: /opt/rclone/service_accounts/crop
-    movies: /opt/rclone/service_accounts/crop
-    music: /opt/rclone/service_accounts/crop
-    4k_movies: /opt/rclone/service_accounts/crop
-    source_4k_movies: /opt/rclone/service_accounts/crop
-    staging: /opt/rclone/service_accounts/staging
+    '/opt/rclone/service_accounts/crop':
+      - tv
+      - movies
+      - music
+      - 4k_movies
+      - source_4k_movies
+      - staging
   global_params:
     default:
       move:

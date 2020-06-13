@@ -31,6 +31,11 @@ func GetPathsInFolder(folder string, includeFiles bool, includeFolders bool, acc
 	var paths []Path
 	var size uint64 = 0
 
+	if _, err := os.Stat(folder); os.IsNotExist(err) {
+		log.WithError(err).Error("Failed finding paths within folder")
+		return paths, size
+	}
+
 	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
 		// skip files if not wanted
 		if !includeFiles && !info.IsDir() {
