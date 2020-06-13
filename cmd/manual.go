@@ -63,12 +63,7 @@ var manualCmd = &cobra.Command{
 				// dest is a remote
 				dstRemote := stringutils.FromLeftUntil(flagDest, ":")
 				log.Debugf("Using service account folder for %q: %v", dstRemote, flagSaFolder)
-
-				if _, ok := remoteSaFolders[flagSaFolder]; ok {
-					remoteSaFolders[flagSaFolder] = append(remoteSaFolders[flagSaFolder], dstRemote)
-				} else {
-					remoteSaFolders[flagSaFolder] = []string{dstRemote}
-				}
+				remoteSaFolders[flagSaFolder] = append(remoteSaFolders[flagSaFolder], dstRemote)
 			}
 
 		default:
