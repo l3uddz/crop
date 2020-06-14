@@ -37,15 +37,13 @@ jobs:
         with:
           go-version: 1.14
 
-      # lint
-      - name: lint
-        run: |
-          make lint
+      - name: go_version
+        run: go version
 
       # test
-      - name: test
-        run: |
-          make test
+#      - name: test
+#        run: |
+#          make test
 
       # cache
       - name: cache
