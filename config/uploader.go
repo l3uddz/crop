@@ -20,19 +20,19 @@ type UploaderRemotes struct {
 	Clean          []string
 	Copy           []string
 	Move           string
-	MoveServerSide []RcloneServerSide `mapstructure:"move_server_side"`
+	MoveServerSide []RcloneServerSide `koanf:"move_server_side"`
 	Dedupe         []string
 }
 
 type UploaderRcloneParams struct {
 	Copy                 []string
-	GlobalCopy           string `mapstructure:"global_copy"`
+	GlobalCopy           string `koanf:"global_copy"`
 	Move                 []string
-	GlobalMove           string   `mapstructure:"global_move"`
-	MoveServerSide       []string `mapstructure:"move_server_side"`
-	GlobalMoveServerSide string   `mapstructure:"global_move_server_side"`
+	GlobalMove           string   `koanf:"global_move"`
+	MoveServerSide       []string `koanf:"move_server_side"`
+	GlobalMoveServerSide string   `koanf:"global_move_server_side"`
 	Dedupe               []string
-	GlobalDedupe         string `mapstructure:"global_dedupe"`
+	GlobalDedupe         string `koanf:"global_dedupe"`
 }
 
 type UploaderConfig struct {
@@ -40,7 +40,7 @@ type UploaderConfig struct {
 	Enabled      bool
 	Check        UploaderCheck
 	Hidden       UploaderHidden
-	LocalFolder  string `mapstructure:"local_folder"`
+	LocalFolder  string `koanf:"local_folder"`
 	Remotes      UploaderRemotes
-	RcloneParams UploaderRcloneParams `mapstructure:"rclone_params"`
+	RcloneParams UploaderRcloneParams `koanf:"rclone_params"`
 }
