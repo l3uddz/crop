@@ -9,12 +9,11 @@ require (
 	github.com/dgraph-io/badger/v2 v2.0.3 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-cmd/cmd v1.2.0
-	github.com/gofiber/fiber v1.11.1
+	github.com/gofiber/fiber v1.12.2
 	github.com/gofiber/recover v0.1.0
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/klauspost/compress v1.10.8 // indirect
 	github.com/knadh/koanf v0.10.0
-	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
