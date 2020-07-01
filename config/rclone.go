@@ -1,13 +1,13 @@
 package config
 
 type RcloneConfig struct {
-	Path                  string                  `koanf:"path"`
-	Config                string                  `koanf:"config"`
-	Stats                 string                  `koanf:"stats"`
-	LiveRotate            bool                    `koanf:"live_rotate"`
-	DryRun                bool                    `koanf:"dry_run"`
-	ServiceAccountRemotes map[string][]string     `koanf:"service_account_remotes"`
-	GlobalParams          map[string]RcloneParams `koanf:"global_params"`
+	Path                  string                  `yaml:"path"`
+	Config                string                  `yaml:"config"`
+	Stats                 string                  `yaml:"stats"`
+	LiveRotate            bool                    `yaml:"live_rotate"`
+	DryRun                bool                    `yaml:"dry_run"`
+	ServiceAccountRemotes map[string][]string     `yaml:"service_account_remotes"`
+	GlobalParams          map[string]RcloneParams `yaml:"global_params"`
 }
 
 type RcloneServerSide struct {
@@ -18,7 +18,7 @@ type RcloneServerSide struct {
 type RcloneParams struct {
 	Copy           []string
 	Move           []string
-	MoveServerSide []string `koanf:"move_server_side"`
+	MoveServerSide []string `yaml:"move_server_side"`
 	Sync           []string
 	Dedupe         []string
 }

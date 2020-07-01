@@ -1,11 +1,11 @@
 package config
 
 import (
-	"github.com/knadh/koanf"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/file"
+	"fmt"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/stringutils"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 type Configuration struct {
@@ -17,16 +17,11 @@ type Configuration struct {
 /* Vars */
 
 var (
-	cfgPath = ""
-
-	// Config exports the config object
 	Config *Configuration
 
-	// Internal
-	delimiter = "."
-	k         = koanf.New(delimiter)
-
-	log = logger.GetLogger("cfg")
+	// internal
+	cfgPath = ""
+	log     = logger.GetLogger("cfg")
 )
 
 /* Public */
@@ -35,14 +30,15 @@ func Init(configFilePath string) error {
 	// set package variables
 	cfgPath = configFilePath
 
-	// load config file
-	if err := k.Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
-		return err
+	// read config file
+	b, err := ioutil.ReadFile(configFilePath)
+	if err != nil {
+		return fmt.Errorf("failed reading config file: %w", err)
 	}
 
-	// unmarshal into struct
-	if err := k.Unmarshal("", &Config); err != nil {
-		return err
+	// decode config file
+	if err := yaml.Unmarshal(b, &Config); err != nil {
+		return fmt.Errorf("failed decoding config file: %w", err)
 	}
 
 	return nil
