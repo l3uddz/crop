@@ -9,7 +9,7 @@ require (
 	github.com/dgraph-io/badger/v2 v2.0.3 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/go-cmd/cmd v1.2.0
+	github.com/go-cmd/cmd v1.2.1
 	github.com/gofiber/fiber v1.12.2
 	github.com/gofiber/recover v0.1.1
 	github.com/golang/protobuf v1.4.2 // indirect
