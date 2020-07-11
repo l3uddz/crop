@@ -67,8 +67,8 @@ github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/me
 github.com/go-test/deep v1.0.5 h1:AKODKU3pDH1RzZzm6YZu77YWtEAq6uh1rLIAQlay2qc=
 github.com/go-test/deep v1.0.5/go.mod h1:QV8Hv/iy04NyLBxAdO9njL0iVPN1S4d/A3NVv1V36o8=
 github.com/gofiber/fiber v1.12.1/go.mod h1:33AHuW8Sgre3E5tOFJJmBe24MXGNg8GnmcNiXEOFgTU=
-github.com/gofiber/fiber v1.12.2 h1:vrTtYnwdSiCoeIJillm3oXhXGBdkkiAzk2IEOH6MhZM=
-github.com/gofiber/fiber v1.12.2/go.mod h1:2tVav1oD8Pus7erL7fc7KHH8O6ZLAJJepW8xTWcA7Lk=
+github.com/gofiber/fiber v1.12.6 h1:Ca/vuticUkHLz9BDZZ8ZNGXMtdY/VOHqw/jYZ427xis=
+github.com/gofiber/fiber v1.12.6/go.mod h1:e+Ur2pP2rb5xKtiHATgfQpSwBR0z9q8Mar9+XfYxpOY=
 github.com/gofiber/recover v0.1.1 h1:M/H+ReIHKKHQAyKpuwi4uQh4J2+lCBWUxOX/gBSQ9ZY=
 github.com/gofiber/recover v0.1.1/go.mod h1:eLpdlv3AOv9fzVWSfa2icQMESqph8fAG20h9ILVuImo=
 github.com/gofiber/utils v0.0.8/go.mod h1:0dwJg4h6ME5RdxgukBF46XCYUBLI6nX5PvD6P4DDFBU=

@@ -10,7 +10,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.0
-	github.com/gofiber/fiber v1.12.2
+	github.com/gofiber/fiber v1.12.6
 	github.com/gofiber/recover v0.1.1
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/klauspost/compress v1.10.10 // indirect
