@@ -112,7 +112,7 @@ var uploadCmd = &cobra.Command{
 					freeDiskSpace := "Unknown"
 					du, err := disk.Usage(upload.Config.LocalFolder)
 					if err == nil {
-						freeDiskSpace = humanize.Bytes(du.Free)
+						freeDiskSpace = humanize.IBytes(du.Free)
 					}
 
 					// check available disk space
@@ -128,7 +128,7 @@ var uploadCmd = &cobra.Command{
 							"until":     res.Info,
 							"free_disk": freeDiskSpace,
 						}).Infof("Upload conditions not met, however, proceeding as free space below %s",
-							humanize.Bytes(upload.Config.Check.MinFreeSpace))
+							humanize.IBytes(upload.Config.Check.MinFreeSpace))
 					default:
 						break
 					}
