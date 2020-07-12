@@ -42,4 +42,3 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-      - "^Merge branch"
