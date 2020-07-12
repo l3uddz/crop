@@ -8,6 +8,7 @@ import (
 	"github.com/l3uddz/crop/rclone"
 	"github.com/l3uddz/crop/uploader"
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strings"
@@ -96,19 +97,56 @@ var uploadCmd = &cobra.Command{
 			}
 
 			// check if upload criteria met
+			forced := false
+
 			if !flagNoCheck {
 				// no check was not enabled
-				if res, err := upload.Check(); err != nil {
+				res, err := upload.Check()
+				if err != nil {
 					upload.Log.WithError(err).Error("Failed checking if uploader check conditions met, skipping...")
 					continue
-				} else if !res.Passed {
-					upload.Log.WithField("until", res.Info).Info("Upload conditions not met, skipping...")
-					continue
+				}
+
+				if !res.Passed {
+					// get free disk space
+					freeDiskSpace := "Unknown"
+					du, err := disk.Usage(upload.Config.LocalFolder)
+					if err == nil {
+						freeDiskSpace = humanize.Bytes(du.Free)
+					}
+
+					// check available disk space
+					switch {
+					case err != nil && upload.Config.Check.MinFreeSpace > 0:
+						// error checking free space
+						upload.Log.WithError(err).Errorf("Failed checking available free space for: %q",
+							upload.Config.LocalFolder)
+					case err == nil && du.Free < upload.Config.Check.MinFreeSpace:
+						// free space has gone below the free space threshold
+						forced = true
+						upload.Log.WithFields(logrus.Fields{
+							"until":     res.Info,
+							"free_disk": freeDiskSpace,
+						}).Infof("Upload conditions not met, however, proceeding as free space below %s",
+							humanize.Bytes(upload.Config.Check.MinFreeSpace))
+					default:
+						break
+					}
+
+					if !forced {
+						upload.Log.WithFields(logrus.Fields{
+							"until":     res.Info,
+							"free_disk": freeDiskSpace,
+						}).Info("Upload conditions not met, skipping...")
+						continue
+					}
+
+					// the upload was forced as min_free_size was met
 				}
 			}
 
 			// perform upload
-			if err := performUpload(upload); err != nil {
+			if err := performUpload(upload, forced); err != nil {
 				upload.Log.WithError(err).Error("Error occurred while running uploader, skipping...")
 				continue
 			}
@@ -126,7 +164,7 @@ func init() {
 	uploadCmd.Flags().BoolVar(&flagNoCheck, "no-check", false, "Ignore check and run")
 }
 
-func performUpload(u *uploader.Uploader) error {
+func performUpload(u *uploader.Uploader, forced bool) error {
 	u.Log.Info("Running...")
 
 	var liveRotateParams []string
@@ -153,9 +191,14 @@ func performUpload(u *uploader.Uploader) error {
 	/* Generate Additional Rclone Params */
 	var additionalRcloneParams []string
 
-	if !flagNoCheck || u.Config.Check.Forced {
-		// if no-check is false (default) or check is forced via config, include check params
-		additionalRcloneParams = u.CheckRcloneParams()
+	switch forced {
+	case false:
+		if !flagNoCheck || u.Config.Check.Forced {
+			// if no-check is false (default) or check is forced via config, include check params
+			additionalRcloneParams = u.CheckRcloneParams()
+		}
+	default:
+		break
 	}
 
 	// add live rotate params set

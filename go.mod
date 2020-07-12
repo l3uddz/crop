@@ -5,12 +5,14 @@ go 1.14
 require (
 	github.com/DataDog/zstd v1.4.5 // indirect
 	github.com/ReneKroon/ttlcache v1.6.0
+	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/dgraph-io/badger/v2 v2.0.3 // indirect
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.1
+	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/gofiber/fiber v1.12.6
 	github.com/gofiber/recover v0.1.1
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -23,6 +25,7 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/rhysd/go-github-selfupdate v1.2.2
+	github.com/shirou/gopsutil v2.20.6+incompatible
 	github.com/sirupsen/logrus v1.6.0
 	github.com/sony/sonyflake v1.0.0 // indirect
 	github.com/spf13/cobra v1.0.0

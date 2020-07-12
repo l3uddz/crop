@@ -1,11 +1,12 @@
 package config
 
 type UploaderCheck struct {
-	Forced  bool
-	Type    string
-	Limit   uint64
-	Exclude []string
-	Include []string
+	Forced       bool
+	MinFreeSpace uint64 `yaml:"min_free_space"`
+	Type         string
+	Limit        uint64
+	Exclude      []string
+	Include      []string
 }
 
 type UploaderHidden struct {
