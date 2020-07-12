@@ -11,7 +11,7 @@ var (
 	}
 )
 
-func (u *Uploader) Check() (bool, error) {
+func (u *Uploader) Check() (*checker.Result, error) {
 	// Perform the check
 	return u.Checker.Check(&u.Config.Check, u.Log, u.LocalFiles, u.LocalFilesSize)
 }

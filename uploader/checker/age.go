@@ -12,18 +12,27 @@ import (
 
 type Age struct{}
 
-func (Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (bool, error) {
+func (Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (*Result, error) {
 	var checkPassed bool
 	var filesPassed int
 	var filesSize int64
+
+	oldestFile := time.Now()
 
 	// Check File Ages
 	maxFileAge := time.Now().Add(time.Duration(-cfg.Limit) * time.Minute)
 
 	for _, path := range paths {
+		path := path
+
 		// skip directories
 		if path.IsDir {
 			continue
+		}
+
+		// set oldestFile
+		if oldestFile.IsZero() || path.ModifiedTime.Before(oldestFile) {
+			oldestFile = path.ModifiedTime
 		}
 
 		// was this file modified after our max file age?
@@ -49,7 +58,10 @@ func (Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils
 		}).Info("Local files matching check criteria")
 	}
 
-	return checkPassed, nil
+	return &Result{
+		Passed: checkPassed,
+		Info:   humanize.RelTime(oldestFile, maxFileAge, "", ""),
+	}, nil
 }
 
 func (Age) CheckFile(cfg *config.UploaderCheck, log *logrus.Entry, path pathutils.Path, size uint64) (bool, error) {

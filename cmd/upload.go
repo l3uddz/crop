@@ -98,11 +98,11 @@ var uploadCmd = &cobra.Command{
 			// check if upload criteria met
 			if !flagNoCheck {
 				// no check was not enabled
-				if shouldUpload, err := upload.Check(); err != nil {
+				if res, err := upload.Check(); err != nil {
 					upload.Log.WithError(err).Error("Failed checking if uploader check conditions met, skipping...")
 					continue
-				} else if !shouldUpload {
-					upload.Log.Info("Upload conditions not met, skipping...")
+				} else if !res.Passed {
+					upload.Log.WithField("until", res.Info).Info("Upload conditions not met, skipping...")
 					continue
 				}
 			}
