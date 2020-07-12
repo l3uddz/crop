@@ -50,7 +50,7 @@ func (u *Uploader) RefreshLocalFiles() error {
 	// log results
 	u.Log.WithFields(logrus.Fields{
 		"found_files":  len(u.LocalFiles),
-		"files_size":   humanize.Bytes(u.LocalFilesSize),
+		"files_size":   humanize.IBytes(u.LocalFilesSize),
 		"local_folder": u.Config.LocalFolder,
 	}).Info("Refreshed local files")
 

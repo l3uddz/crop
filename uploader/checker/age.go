@@ -54,7 +54,7 @@ func (Age) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils
 	if checkPassed {
 		log.WithFields(logrus.Fields{
 			"files_passed": filesPassed,
-			"files_size":   humanize.Bytes(uint64(filesSize)),
+			"files_size":   humanize.IBytes(uint64(filesSize)),
 		}).Info("Local files matching check criteria")
 	}
 

@@ -13,11 +13,11 @@ type Size struct{}
 func (Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutils.Path, size uint64) (*Result, error) {
 	// Check Total Size
 	if size > cfg.Limit {
-		s := humanize.Bytes(size)
+		s := humanize.IBytes(size)
 		log.WithFields(logrus.Fields{
-			"max_size":     humanize.Bytes(cfg.Limit),
+			"max_size":     humanize.IBytes(cfg.Limit),
 			"current_size": s,
-			"over_size":    humanize.Bytes(size - cfg.Limit),
+			"over_size":    humanize.IBytes(size - cfg.Limit),
 		}).Info("Size is greater than specified limit")
 
 		return &Result{
@@ -28,7 +28,7 @@ func (Size) Check(cfg *config.UploaderCheck, log *logrus.Entry, paths []pathutil
 
 	return &Result{
 		Passed: false,
-		Info:   humanize.Bytes(cfg.Limit - size),
+		Info:   humanize.IBytes(cfg.Limit - size),
 	}, nil
 }
 
