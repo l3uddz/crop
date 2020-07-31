@@ -1,0 +1,13 @@
+# /etc/systemd/system/crop_upload.timer
+[Unit]
+Description=crop upload
+After=network-online.target
+
+[Timer]
+# hourly, daily, weekly are valid. as are OnCalendar=DayOfWeek Year-Month-Day Hour:Minute:Second (example:  "OnCalendar=Mon..Fri 22:00" to run weekdays at 22:00, a second line can be added i.e. "OnCalendar=Sat,Sun 03:00" to run at 3am on weekends.)
+#OnCalendar=hourly
+# to use inactivity since last finished running, 1h can be used for 1hour.
+OnUnitInactiveSec=5m
+
+[Install]
+WantedBy=timers.target
