@@ -1,0 +1,14 @@
+# /etc/systemd/system/crop_clean.service
+[Unit]
+Description=crop clean
+After=network-online.target
+
+[Service]
+User=1000
+Group=1000
+Type=exec
+ExecStart=/opt/crop/crop clean
+ExecStopPost=/bin/rm -rf /opt/crop/crop.lock
+
+[Install]
+WantedBy=default.target
