@@ -18,7 +18,6 @@ import (
 var (
 	flagSyncer      string
 	flagParallelism int
-	flagNoDedupe    bool
 )
 
 var syncCmd = &cobra.Command{
