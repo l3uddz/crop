@@ -26,6 +26,7 @@ var (
 	flagLogFile      = "activity.log"
 	flagLockFile     = "crop.lock"
 	flagDryRun       bool
+	flagNoDedupe     bool
 
 	// Global command specific
 	flagUploader string

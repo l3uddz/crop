@@ -162,6 +162,7 @@ func init() {
 	uploadCmd.Flags().StringVarP(&flagUploader, "uploader", "u", "", "Run for a specific uploader")
 
 	uploadCmd.Flags().BoolVar(&flagNoCheck, "no-check", false, "Ignore check and run")
+	uploadCmd.Flags().BoolVar(&flagNoDedupe, "no-dedupe", false, "Ignore dedupe tasks for uploader")
 }
 
 func performUpload(u *uploader.Uploader, forced bool) error {
@@ -240,7 +241,7 @@ func performUpload(u *uploader.Uploader, forced bool) error {
 	}
 
 	/* Dedupe */
-	if len(u.Config.Remotes.Dedupe) > 0 {
+	if !flagNoDedupe && len(u.Config.Remotes.Dedupe) > 0 {
 		u.Log.Info("Running dedupes...")
 
 		if err := u.Dedupe(nil); err != nil {

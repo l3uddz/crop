@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Syncer) Sync(additionalRcloneParams []string) error {
+func (s *Syncer) Sync(additionalRcloneParams []string, daisyChain bool) error {
 	// set variables
 	extraParams := s.Config.RcloneParams.Sync
 	if additionalRcloneParams != nil {
@@ -23,26 +23,35 @@ func (s *Syncer) Sync(additionalRcloneParams []string) error {
 	// add server side parameter
 	extraParams = append(extraParams, "--drive-server-side-across-configs")
 
+	pos := 0
+	srcRemote := s.Config.SourceRemote
+
 	// iterate all remotes and run sync
 	for _, remotePath := range s.Config.Remotes.Sync {
 		// set variables
 		attempts := 1
+
+		// daisy
+		if daisyChain && pos > 0 {
+			srcRemote = s.Config.Remotes.Sync[pos-1]
+		}
+		pos++
 
 		// sync to remote
 		for {
 			// set log
 			rLog := s.Log.WithFields(logrus.Fields{
 				"sync_remote":   remotePath,
-				"source_remote": s.Config.SourceRemote,
+				"source_remote": srcRemote,
 				"attempts":      attempts,
 			})
 
 			// get service account file(s)
-			serviceAccounts, err := s.RemoteServiceAccountFiles.GetServiceAccount(s.Config.SourceRemote, remotePath)
+			serviceAccounts, err := s.RemoteServiceAccountFiles.GetServiceAccount(srcRemote, remotePath)
 			if err != nil {
 				return errors.WithMessagef(err,
 					"aborting further sync attempts of %q due to serviceAccount exhaustion",
-					s.Config.SourceRemote)
+					srcRemote)
 			}
 
 			// display service account(s) being used
@@ -54,7 +63,7 @@ func (s *Syncer) Sync(additionalRcloneParams []string) error {
 
 			// sync
 			rLog.Info("Syncing...")
-			success, exitCode, err := rclone.Sync(s.Config.SourceRemote, remotePath, serviceAccounts, extraParams)
+			success, exitCode, err := rclone.Sync(srcRemote, remotePath, serviceAccounts, extraParams)
 
 			// check result
 			if err != nil {

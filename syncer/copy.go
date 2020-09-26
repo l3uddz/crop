@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Syncer) Copy(additionalRcloneParams []string) error {
+func (s *Syncer) Copy(additionalRcloneParams []string, daisyChain bool) error {
 	// set variables
 	extraParams := s.Config.RcloneParams.Copy
 	if additionalRcloneParams != nil {
@@ -23,26 +23,35 @@ func (s *Syncer) Copy(additionalRcloneParams []string) error {
 	// add server side parameter
 	extraParams = append(extraParams, "--drive-server-side-across-configs")
 
+	pos := 0
+	srcRemote := s.Config.SourceRemote
+
 	// iterate all remotes and run copy
 	for _, remotePath := range s.Config.Remotes.Copy {
 		// set variables
 		attempts := 1
+
+		// daisy
+		if daisyChain && pos > 0 {
+			srcRemote = s.Config.Remotes.Copy[pos-1]
+		}
+		pos++
 
 		// copy to remote
 		for {
 			// set log
 			rLog := s.Log.WithFields(logrus.Fields{
 				"copy_remote":   remotePath,
-				"source_remote": s.Config.SourceRemote,
+				"source_remote": srcRemote,
 				"attempts":      attempts,
 			})
 
 			// get service account file(s)
-			serviceAccounts, err := s.RemoteServiceAccountFiles.GetServiceAccount(s.Config.SourceRemote, remotePath)
+			serviceAccounts, err := s.RemoteServiceAccountFiles.GetServiceAccount(srcRemote, remotePath)
 			if err != nil {
 				return errors.WithMessagef(err,
 					"aborting further copy attempts of %q due to serviceAccount exhaustion",
-					s.Config.SourceRemote)
+					srcRemote)
 			}
 
 			// display service account(s) being used
@@ -54,7 +63,7 @@ func (s *Syncer) Copy(additionalRcloneParams []string) error {
 
 			// copy
 			rLog.Info("Copying...")
-			success, exitCode, err := rclone.Copy(s.Config.SourceRemote, remotePath, serviceAccounts, extraParams)
+			success, exitCode, err := rclone.Copy(srcRemote, remotePath, serviceAccounts, extraParams)
 
 			// check result
 			if err != nil {

@@ -18,7 +18,7 @@ import (
 var (
 	flagSyncer      string
 	flagParallelism int
-	flagNoDedupe    bool
+	flagDaisyChain  bool
 )
 
 var syncCmd = &cobra.Command{
@@ -114,6 +114,7 @@ func init() {
 	syncCmd.Flags().StringVarP(&flagSyncer, "syncer", "s", "", "Run for a specific syncer")
 	syncCmd.Flags().IntVarP(&flagParallelism, "parallelism", "p", 1, "Max parallel syncers")
 
+	syncCmd.Flags().BoolVar(&flagDaisyChain, "daisy-chain", false, "Daisy chain source remotes")
 	syncCmd.Flags().BoolVar(&flagNoDedupe, "no-dedupe", false, "Ignore dedupe tasks for syncer")
 }
 
@@ -147,7 +148,7 @@ func performSync(s *syncer.Syncer) error {
 	if len(s.Config.Remotes.Copy) > 0 {
 		s.Log.Info("Running copies...")
 
-		if err := s.Copy(liveRotateParams); err != nil {
+		if err := s.Copy(liveRotateParams, flagDaisyChain); err != nil {
 			return errors.WithMessage(err, "failed performing all copies")
 		}
 
@@ -158,7 +159,7 @@ func performSync(s *syncer.Syncer) error {
 	if len(s.Config.Remotes.Sync) > 0 {
 		s.Log.Info("Running syncs...")
 
-		if err := s.Sync(liveRotateParams); err != nil {
+		if err := s.Sync(liveRotateParams, flagDaisyChain); err != nil {
 			return errors.WithMessage(err, "failed performing all syncs")
 		}
 
