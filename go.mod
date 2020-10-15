@@ -13,7 +13,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-cmd/cmd v1.2.1
 	github.com/go-ole/go-ole v1.2.4 // indirect
-	github.com/gofiber/fiber v1.14.6
+	github.com/gofiber/fiber/v2/v2 v2.1.0
 	github.com/gofiber/recover v0.1.2
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
