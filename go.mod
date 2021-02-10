@@ -26,7 +26,7 @@ require (
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/rhysd/go-github-selfupdate v1.2.2
-	github.com/shirou/gopsutil v2.20.8+incompatible
+	github.com/shirou/gopsutil v2.20.9+incompatible
 	github.com/sirupsen/logrus v1.6.0
 	github.com/sony/sonyflake v1.0.0 // indirect
 	github.com/spf13/cobra v1.0.0
