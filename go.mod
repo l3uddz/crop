@@ -11,7 +11,7 @@ require (
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/go-cmd/cmd v1.2.1
+	github.com/go-cmd/cmd v1.3.0
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/recover v0.1.2
