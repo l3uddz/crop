@@ -110,7 +110,7 @@ func (s *Syncer) Copy(additionalRcloneParams []string, daisyChain bool) error {
 		}
 
 		// sleep before moving on
-		if daisyChain {
+		if daisyChain && pos < len(s.Config.Remotes.Copy) {
 			s.Log.Info("Waiting 60 seconds before continuing...")
 			time.Sleep(60 * time.Second)
 		}
