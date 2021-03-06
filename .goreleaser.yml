@@ -8,9 +8,12 @@ builds:
     goos:
       - linux
       - darwin
-#      - windows
     goarch:
       - amd64
+      - arm64
+      - arm
+    goarm:
+      - 7
     ldflags:
       - -s -w
       - -X "github.com/l3uddz/crop/runtime.Version={{ .Version }}"
@@ -21,11 +24,9 @@ builds:
 
 # Archive
 archives:
-  - name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: "tar.gz"
-    format_overrides:
-      - goos: windows
-        format: zip
+  -
+    name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    format: "binary"
 
 # Checksum
 checksum:

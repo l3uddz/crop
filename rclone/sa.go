@@ -2,7 +2,7 @@ package rclone
 
 import (
 	"fmt"
-	"github.com/ReneKroon/ttlcache"
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/l3uddz/crop/cache"
 	"github.com/l3uddz/crop/logger"
 	"github.com/l3uddz/crop/maputils"
@@ -47,7 +47,7 @@ var (
 
 func init() {
 	mcache = ttlcache.NewCache()
-	mcache.SetTTL(60 * time.Minute)
+	_ = mcache.SetTTL(60 * time.Minute)
 	mcache.SetExpirationCallback(mcacheItemExpired)
 }
 
@@ -57,7 +57,7 @@ func mcacheItemExpired(key string, _ interface{}) {
 
 func addServiceAccountsToTempCache(serviceAccounts []*RemoteServiceAccount) {
 	for _, sa := range serviceAccounts {
-		mcache.Set(sa.ServiceAccountPath, nil)
+		_ = mcache.Set(sa.ServiceAccountPath, nil)
 	}
 }
 
@@ -224,8 +224,7 @@ func (m *ServiceAccountManager) GetServiceAccount(remotePaths ...string) ([]*Rem
 			}
 
 			// has this service account been issued within N seconds?
-			_, exists := mcache.Get(sa.RealPath)
-			if exists {
+			if _, err := mcache.Get(sa.RealPath); err == nil {
 				// this sa was in our memory cache and has not expired yet
 				continue
 			}
@@ -283,7 +282,7 @@ func RemoveServiceAccountsFromTempCache(serviceAccounts []*RemoteServiceAccount)
 	defer mtx.Unlock()
 
 	for _, sa := range serviceAccounts {
-		mcache.Remove(sa.ServiceAccountPath)
+		_ = mcache.Remove(sa.ServiceAccountPath)
 	}
 }
 

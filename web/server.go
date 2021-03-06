@@ -2,8 +2,8 @@ package web
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber"
-	"github.com/gofiber/recover"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/l3uddz/crop/rclone"
 	"github.com/phayes/freeport"
 	"github.com/sirupsen/logrus"
@@ -14,8 +14,8 @@ import (
 /* Const */
 
 const (
-	maxSaCacheHits       int           = 4
-	durationSaCacheEntry time.Duration = 10 * time.Second
+	maxSaCacheHits       int = 4
+	durationSaCacheEntry     = 10 * time.Second
 )
 
 /* Var */
@@ -59,7 +59,9 @@ func New(host string, log *logrus.Entry, name string, sa *rclone.ServiceAccountM
 	ws := &Server{
 		Host: host,
 		Port: port,
-		app:  fiber.New(),
+		app: fiber.New(fiber.Config{
+			DisableStartupMessage: true,
+		}),
 		log:  log,
 		name: name,
 		sa:   sa,
@@ -68,9 +70,6 @@ func New(host string, log *logrus.Entry, name string, sa *rclone.ServiceAccountM
 			Mutex: sync.Mutex{},
 		},
 	}
-
-	// setup app
-	ws.app.Settings.DisableStartupMessage = true
 
 	// middleware(s)
 	ws.app.Use(recover.New())
