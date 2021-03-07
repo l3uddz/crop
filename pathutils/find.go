@@ -37,6 +37,11 @@ func GetPathsInFolder(folder string, includeFiles bool, includeFolders bool, acc
 	}
 
 	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+		// handle err
+		if err != nil {
+			return err
+		}
+
 		// skip files if not wanted
 		if !includeFiles && !info.IsDir() {
 			log.Tracef("Skipping file: %s", path)

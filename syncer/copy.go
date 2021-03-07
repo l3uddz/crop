@@ -7,6 +7,7 @@ import (
 	"github.com/l3uddz/crop/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 func (s *Syncer) Copy(additionalRcloneParams []string, daisyChain bool) error {
@@ -106,6 +107,12 @@ func (s *Syncer) Copy(additionalRcloneParams []string, daisyChain bool) error {
 			default:
 				return fmt.Errorf("failed and cannot proceed with exit code: %v", exitCode)
 			}
+		}
+
+		// sleep before moving on
+		if daisyChain && pos < len(s.Config.Remotes.Copy) {
+			s.Log.Info("Waiting 60 seconds before continuing...")
+			time.Sleep(60 * time.Second)
 		}
 	}
 

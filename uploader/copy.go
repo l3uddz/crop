@@ -66,7 +66,7 @@ func (u *Uploader) Copy(additionalRcloneParams []string) error {
 			switch exitCode {
 			case rclone.ExitFatalError:
 				// are we using service accounts?
-				if len(serviceAccounts) > 0 {
+				if len(serviceAccounts) == 0 {
 					// we are not using service accounts, so mark this remote as banned
 					if err := cache.SetBanned(stringutils.FromLeftUntil(remotePath, ":"), 25); err != nil {
 						rLog.WithError(err).Errorf("Failed banning remote")

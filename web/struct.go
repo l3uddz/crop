@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/l3uddz/crop/rclone"
 	"github.com/sirupsen/logrus"
 	"sync"

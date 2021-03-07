@@ -1,12 +1,12 @@
 package web
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/l3uddz/crop/cache"
 	"time"
 )
 
-func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
+func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) error {
 	// only accept json
 	c.Accepts("application/json")
 
@@ -18,8 +18,7 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 	req := new(ServiceAccountRequest)
 	if err := c.BodyParser(req); err != nil {
 		ws.log.WithError(err).Error("Failed parsing service account request from rclone...")
-		c.SendStatus(500)
-		return
+		return c.SendStatus(500)
 	}
 
 	// have we issued a replacement sa for this banned sa?
@@ -31,8 +30,7 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 		nsa.Hits++
 		if nsa.Hits <= maxSaCacheHits {
 			// return last response
-			c.SendString(nsa.ResponseServiceAccount)
-			return
+			return c.SendString(nsa.ResponseServiceAccount)
 		}
 
 		// remove entries that have exceeded max hits
@@ -50,8 +48,7 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 	// ban this service account
 	if err := cache.SetBanned(req.OldServiceAccount, 25); err != nil {
 		ws.log.WithError(err).Error("Failed banning service account, cannot try again...")
-		c.SendStatus(500)
-		return
+		return c.SendStatus(500)
 	}
 
 	// get service account for this remote
@@ -59,12 +56,10 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 	switch {
 	case err != nil:
 		ws.log.WithError(err).Errorf("Failed retrieving service account for remote: %q", req.Remote)
-		c.SendStatus(500)
-		return
+		return c.SendStatus(500)
 	case len(sa) < 1:
 		ws.log.Errorf("Failed finding service account for remote: %q", req.Remote)
-		c.SendStatus(500)
-		return
+		return c.SendStatus(500)
 	default:
 		break
 	}
@@ -85,5 +80,5 @@ func (ws *Server) ServiceAccountHandler(c *fiber.Ctx) {
 
 	// return service account
 	ws.log.Warnf("New service account for remote %q, sa: %v", req.Remote, sa[0].ServiceAccountPath)
-	c.SendString(sa[0].ServiceAccountPath)
+	return c.SendString(sa[0].ServiceAccountPath)
 }

@@ -20,7 +20,6 @@ jobs:
       # dependencies
       - name: dependencies
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b /usr/local/bin v1.24.0
           curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sudo sh -s -- -b /usr/local/bin
 
       # checkout
@@ -33,15 +32,12 @@ jobs:
       - name: go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.15
+          go-version: 1.16
 
-      - name: go_version
-        run: go version
-
-      # test
-#      - name: test
-#        run: |
-#          make test
+      - name: go info
+        run: |
+          go version
+          go env
 
       # cache
       - name: cache
@@ -56,6 +52,10 @@ jobs:
       - name: vendor
         run: |
           make vendor
+
+      # git status
+      - name: git status
+        run: git status
 
       # build
       - name: build
@@ -76,16 +76,10 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_linux
-          path: dist/*linux*.tar.gz
+          path: dist/*linux*
 
       - name: artifact_darwin
         uses: actions/upload-artifact@v2-preview
         with:
           name: build_darwin
-          path: dist/*darwin*.tar.gz
-
-#      - name: artifact_windows
-#        uses: actions/upload-artifact@v2-preview
-#        with:
-#          name: build_windows
-#          path: dist/*windows*.zip
+          path: dist/*darwin*
