@@ -60,7 +60,7 @@ fetch: ## Fetch vendor files
 
 .PHONY: release
 release: check_goreleaser ## Generate a release, but don't publish
-	goreleaser --skip-validate --skip-publish --rm-dist
+	goreleaser --skip-publish --rm-dist
 
 .PHONY: publish
 publish: check_goreleaser ## Generate a release, and publish
@@ -68,7 +68,7 @@ publish: check_goreleaser ## Generate a release, and publish
 
 .PHONY: snapshot
 snapshot: check_goreleaser ## Generate a snapshot release
-	goreleaser --snapshot --skip-validate --skip-publish --rm-dist
+	goreleaser --snapshot --skip-publish --rm-dist
 
 .PHONY: help
 help:
