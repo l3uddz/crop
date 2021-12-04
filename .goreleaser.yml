@@ -19,6 +19,11 @@ builds:
     flags:
       - -trimpath
 
+# MacOS Universal Binaries
+universal_binaries:
+  -
+    replace: true
+
 # Archive
 archives:
   -
